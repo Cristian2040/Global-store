@@ -142,32 +142,45 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Progress Bar */}
-                <div className="mb-8">
-                    <div className="flex justify-between items-center">
-                        {[1, 2, 3, 4].map((s) => (
-                            <div key={s} className="flex items-center flex-1">
-                                <div
-                                    className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all ${s <= step
-                                        ? 'bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/30'
-                                        : 'bg-transparent text-gray-500 border-2 border-gray-600'
-                                        }`}
-                                >
-                                    {s < step ? <Check className="w-5 h-5" /> : s}
-                                </div>
-                                {s < 4 && (
+                <div className="mb-15 w-full">
+                    <div className="relative flex justify-between">
+                        {[
+                            { id: 1, label: 'Rol' },
+                            { id: 2, label: 'Datos' },
+                            { id: 3, label: 'Detalles' },
+                            { id: 4, label: 'Confirmar' }
+                        ].map((s, index, array) => (
+                            <div key={s.id} className="flex items-center flex-1 last:flex-none">
+                                {/* Contenedor Vertical: Círculo + Texto */}
+                                <div className="flex flex-col items-center relative min-w-[64px]">
                                     <div
-                                        className={`flex-1 h-0.5 mx-3 transition-all ${s < step ? 'bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600' : 'bg-gray-700'
+                                        className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all z-10 ${s.id <= step
+                                                ? 'bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/30'
+                                                : 'bg-slate-900 text-gray-500 border-2 border-gray-600'
                                             }`}
-                                    />
+                                    >
+                                        {s.id < step ? <Check className="w- h-5" /> : s.id}
+                                    </div>
+
+                                    {/* Etiqueta del paso */}
+                                    <span className={`absolute -bottom-8 whitespace-nowrap text-sm transition-colors ${s.id <= step ? 'text-white font-medium' : 'text-gray-500'
+                                        }`}>
+                                        {s.label}
+                                    </span>
+                                </div>
+
+                                {/* Línea conectora */}
+                                {index < array.length - 1 && (
+                                    <div className="flex-1 h-0.5 mx-2 bg-gray-700">
+                                        <div
+                                            className={`h-full transition-all duration-500 ${s.id < step ? 'bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600' : 'w-0'
+                                                }`}
+                                            style={{ width: s.id < step ? '100%' : '0%' }}
+                                        />
+                                    </div>
                                 )}
                             </div>
                         ))}
-                    </div>
-                    <div className="flex justify-between mt-4 text-sm text-gray-400">
-                        <span>Rol</span>
-                        <span>Datos</span>
-                        <span>Detalles</span>
-                        <span>Confirmar</span>
                     </div>
                 </div>
 

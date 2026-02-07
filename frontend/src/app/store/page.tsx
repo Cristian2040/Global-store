@@ -16,7 +16,7 @@ export default function StoreDashboard() {
         <DashboardLayout role="store" title="Panel de Control">
             <div className="space-y-6">
                 {/* Welcome Section */}
-                <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-8 text-white">
+                <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 rounded-xl p-8 text-white shadow-lg shadow-purple-500/20">
                     <h2 className="text-3xl font-bold mb-2">Panel de Gestión</h2>
                     <p className="text-purple-100">Administra tu tienda y mantén el control de tus ventas</p>
                 </div>
@@ -29,8 +29,8 @@ export default function StoreDashboard() {
                                 <div className={`w-16 h-16 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center text-white mb-4`}>
                                     {stat.icon}
                                 </div>
-                                <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
-                                <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                                <p className="text-sm text-gray-400 mb-1">{stat.label}</p>
+                                <p className="text-3xl font-bold text-white">{stat.value}</p>
                             </CardContent>
                         </Card>
                     ))}
@@ -49,9 +49,9 @@ export default function StoreDashboard() {
                         <CardContent>
                             <div className="space-y-3">
                                 {['Leche', 'Pan', 'Huevos'].map((product, i) => (
-                                    <div key={i} className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
-                                        <span className="font-medium text-gray-900">{product}</span>
-                                        <span className="text-sm text-orange-600 font-semibold">{5 - i} unidades</span>
+                                    <div key={i} className="flex items-center justify-between p-3 bg-orange-900/30 border border-orange-700 rounded-lg">
+                                        <span className="font-medium text-white">{product}</span>
+                                        <span className="text-sm text-orange-400 font-semibold">{5 - i} unidades</span>
                                     </div>
                                 ))}
                             </div>
@@ -67,12 +67,12 @@ export default function StoreDashboard() {
                         <CardContent>
                             <div className="space-y-3">
                                 {[1, 2, 3].map((i) => (
-                                    <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <div key={i} className="flex items-center justify-between p-3 bg-gray-800 rounded-lg border border-gray-700">
                                         <div>
-                                            <p className="font-semibold text-gray-900">Pedido #{2000 + i}</p>
-                                            <p className="text-sm text-gray-600">Cliente {i}</p>
+                                            <p className="font-semibold text-white">Pedido #{2000 + i}</p>
+                                            <p className="text-sm text-gray-400">Cliente {i}</p>
                                         </div>
-                                        <span className="inline-block px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">
+                                        <span className="inline-block px-3 py-1 text-xs font-semibold text-blue-300 bg-blue-900/50 border border-blue-700 rounded-full">
                                             Nuevo
                                         </span>
                                     </div>

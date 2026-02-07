@@ -16,7 +16,7 @@ export default function SupplierDashboard() {
         <DashboardLayout role="supplier" title="Panel de Proveedor">
             <div className="space-y-6">
                 {/* Welcome Section */}
-                <div className="bg-gradient-to-r from-orange-600 to-red-600 rounded-xl p-8 text-white">
+                <div className="bg-gradient-to-r from-orange-600 via-red-600 to-orange-600 rounded-xl p-8 text-white shadow-lg shadow-orange-500/20">
                     <h2 className="text-3xl font-bold mb-2">Panel de Proveedor</h2>
                     <p className="text-orange-100">Gestiona tus productos y entregas a tiendas</p>
                 </div>
@@ -29,8 +29,8 @@ export default function SupplierDashboard() {
                                 <div className={`w-16 h-16 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center text-white mb-4`}>
                                     {stat.icon}
                                 </div>
-                                <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
-                                <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                                <p className="text-sm text-gray-400 mb-1">{stat.label}</p>
+                                <p className="text-3xl font-bold text-white">{stat.value}</p>
                             </CardContent>
                         </Card>
                     ))}
@@ -46,12 +46,12 @@ export default function SupplierDashboard() {
                         <CardContent>
                             <div className="space-y-3">
                                 {[1, 2, 3].map((i) => (
-                                    <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <div key={i} className="flex items-center justify-between p-3 bg-gray-800 rounded-lg border border-gray-700">
                                         <div>
-                                            <p className="font-semibold text-gray-900">Pedido #{3000 + i}</p>
-                                            <p className="text-sm text-gray-600">Tienda Local {i}</p>
+                                            <p className="font-semibold text-white">Pedido #{3000 + i}</p>
+                                            <p className="text-sm text-gray-400">Tienda Local {i}</p>
                                         </div>
-                                        <span className="inline-block px-3 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">
+                                        <span className="inline-block px-3 py-1 text-xs font-semibold text-yellow-300 bg-yellow-900/50 border border-yellow-700 rounded-full">
                                             Pendiente
                                         </span>
                                     </div>
@@ -69,12 +69,12 @@ export default function SupplierDashboard() {
                         <CardContent>
                             <div className="space-y-3">
                                 {[1, 2, 3].map((i) => (
-                                    <div key={i} className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                                    <div key={i} className="flex items-center justify-between p-3 bg-green-900/30 border border-green-700 rounded-lg">
                                         <div>
-                                            <p className="font-semibold text-gray-900">Entrega #{4000 + i}</p>
-                                            <p className="text-sm text-gray-600">Tienda Local {i}</p>
+                                            <p className="font-semibold text-white">Entrega #{4000 + i}</p>
+                                            <p className="text-sm text-gray-400">Tienda Local {i}</p>
                                         </div>
-                                        <span className="inline-block px-3 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
+                                        <span className="inline-block px-3 py-1 text-xs font-semibold text-green-300 bg-green-900/50 border border-green-700 rounded-full">
                                             En ruta
                                         </span>
                                     </div>

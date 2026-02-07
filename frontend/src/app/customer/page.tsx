@@ -16,9 +16,9 @@ export default function CustomerDashboard() {
         <DashboardLayout role="customer" title="Inicio">
             <div className="space-y-6">
                 {/* Welcome Section */}
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-8 text-white">
+                <div className="bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 rounded-xl p-8 text-white shadow-lg shadow-blue-500/20">
                     <h2 className="text-3xl font-bold mb-2">¡Bienvenido de vuelta!</h2>
-                    <p className="text-blue-100">Descubre nuevos productos y ofertas de tus tiendas favoritas</p>
+                    <p className="text-cyan-100">Descubre nuevos productos y ofertas de tus tiendas favoritas</p>
                 </div>
 
                 {/* Stats Grid */}
@@ -29,8 +29,8 @@ export default function CustomerDashboard() {
                                 <div className={`w-16 h-16 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center text-white mb-4`}>
                                     {stat.icon}
                                 </div>
-                                <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
-                                <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                                <p className="text-sm text-gray-400 mb-1">{stat.label}</p>
+                                <p className="text-3xl font-bold text-white">{stat.value}</p>
                             </CardContent>
                         </Card>
                     ))}
@@ -45,14 +45,14 @@ export default function CustomerDashboard() {
                     <CardContent>
                         <div className="space-y-4">
                             {[1, 2, 3].map((i) => (
-                                <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                <div key={i} className="flex items-center justify-between p-4 bg-gray-800 rounded-lg border border-gray-700">
                                     <div>
-                                        <p className="font-semibold text-gray-900">Pedido #{1000 + i}</p>
-                                        <p className="text-sm text-gray-600">Tienda Local {i}</p>
+                                        <p className="font-semibold text-white">Pedido #{1000 + i}</p>
+                                        <p className="text-sm text-gray-400">Tienda Local {i}</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-semibold text-gray-900">$150.00</p>
-                                        <span className="inline-block px-3 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
+                                        <p className="font-semibold text-white">$150.00</p>
+                                        <span className="inline-block px-3 py-1 text-xs font-semibold text-green-300 bg-green-900/50 border border-green-700 rounded-full">
                                             En camino
                                         </span>
                                     </div>
