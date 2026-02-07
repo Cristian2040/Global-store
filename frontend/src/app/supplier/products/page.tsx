@@ -86,116 +86,116 @@ export default function SupplierProductsPage() {
                         <div className="flex items-center">
                             <Package className="w-6 h-6 mr-2 text-cyan-400" />
                             Mis Productos
+                        </div>
+                        <Button onClick={() => {
+                            setEditingProduct(null);
+                            setIsModalOpen(true);
+                        }}>
+                            <Plus className="w-4 h-4 mr-2" />
+                            Nuevo Producto
+                        </Button>
                     </CardTitle>
-                    <Button onClick={() => {
-                        setEditingProduct(null);
-                        setIsModalOpen(true);
-                    }}>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Nuevo Producto
-                    </Button>
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <Table data={products} columns={columns} />
-            </CardContent>
-        </Card>
+                </CardHeader>
+                <CardContent>
+                    <Table data={products} columns={columns} />
+                </CardContent>
+            </Card>
 
-            {/* Product Form Modal */ }
-    <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={editingProduct ? 'Editar Producto' : 'Nuevo Producto'}
-        size="lg"
-        footer={
-            <>
-                <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-                    Cancelar
-                </Button>
-                <Button>Guardar</Button>
-            </>
-        }
-    >
-        <form className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-400 mb-2">
-                        Nombre del Producto
-                    </label>
-                    <input
-                        type="text"
-                        defaultValue={editingProduct?.name}
-                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                    />
-                </div>
+            {/* Product Form Modal */}
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title={editingProduct ? 'Editar Producto' : 'Nuevo Producto'}
+                size="lg"
+                footer={
+                    <>
+                        <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+                            Cancelar
+                        </Button>
+                        <Button>Guardar</Button>
+                    </>
+                }
+            >
+                <form className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-400 mb-2">
+                                Nombre del Producto
+                            </label>
+                            <input
+                                type="text"
+                                defaultValue={editingProduct?.name}
+                                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                            />
+                        </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">
-                        Categoría
-                    </label>
-                    <select
-                        defaultValue={editingProduct?.category}
-                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                    >
-                        <option>Frutas</option>
-                        <option>Verduras</option>
-                        <option>Lácteos</option>
-                        <option>Carnes</option>
-                        <option>Panadería</option>
-                    </select>
-                </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-400 mb-2">
+                                Categoría
+                            </label>
+                            <select
+                                defaultValue={editingProduct?.category}
+                                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                            >
+                                <option>Frutas</option>
+                                <option>Verduras</option>
+                                <option>Lácteos</option>
+                                <option>Carnes</option>
+                                <option>Panadería</option>
+                            </select>
+                        </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">
-                        Precio Mayorista
-                    </label>
-                    <input
-                        type="number"
-                        step="0.01"
-                        defaultValue={editingProduct?.price}
-                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                    />
-                </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-400 mb-2">
+                                Precio Mayorista
+                            </label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                defaultValue={editingProduct?.price}
+                                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                            />
+                        </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">
-                        Pedido Mínimo
-                    </label>
-                    <input
-                        type="number"
-                        defaultValue={editingProduct?.minOrder}
-                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                    />
-                </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-400 mb-2">
+                                Pedido Mínimo
+                            </label>
+                            <input
+                                type="number"
+                                defaultValue={editingProduct?.minOrder}
+                                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                            />
+                        </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">
-                        Unidad
-                    </label>
-                    <select
-                        defaultValue={editingProduct?.unit}
-                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                    >
-                        <option>kg</option>
-                        <option>litro</option>
-                        <option>unidad</option>
-                        <option>caja</option>
-                    </select>
-                </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-400 mb-2">
+                                Unidad
+                            </label>
+                            <select
+                                defaultValue={editingProduct?.unit}
+                                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                            >
+                                <option>kg</option>
+                                <option>litro</option>
+                                <option>unidad</option>
+                                <option>caja</option>
+                            </select>
+                        </div>
 
-                <div className="flex items-center gap-3">
-                    <input
-                        type="checkbox"
-                        defaultChecked={editingProduct?.available ?? true}
-                        className="w-5 h-5"
-                    />
-                    <label className="text-sm font-medium text-gray-400">
-                        Producto Disponible
-                    </label>
-                </div>
-            </div>
-        </form>
-    </Modal>
-        </DashboardLayout >
+                        <div className="flex items-center gap-3">
+                            <input
+                                type="checkbox"
+                                defaultChecked={editingProduct?.available ?? true}
+                                className="w-5 h-5"
+                            />
+                            <label className="text-sm font-medium text-gray-400">
+                                Producto Disponible
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </Modal>
+        </DashboardLayout>
     );
 }
