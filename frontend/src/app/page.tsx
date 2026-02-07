@@ -40,20 +40,20 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-purple-950">
       {/* Navbar */}
-      <nav className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+      <nav className="bg-gray-900/80 backdrop-blur-md shadow-lg border-b border-gray-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <Image src="/logo.png" alt="GlobalStore" width={40} height={40} />
-              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
                 GlobalStore
               </span>
             </div>
             <div className="flex items-center space-x-4">
               <Link href="/login">
-                <Button variant="ghost">Iniciar Sesión</Button>
+                <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-gray-800">Iniciar Sesión</Button>
               </Link>
               <Link href="/register">
                 <Button variant="primary">Registrarse</Button>
@@ -72,13 +72,13 @@ export default function HomePage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
                 Tu plataforma de
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
                   {' '}comercio local
                 </span>
               </h1>
-              <p className="text-xl text-gray-600 mb-8">
+              <p className="text-xl text-gray-300 mb-8">
                 Conectamos clientes, tiendas y proveedores en un ecosistema digital completo
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -89,7 +89,7 @@ export default function HomePage() {
                   </Button>
                 </Link>
                 <Link href="#features">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white">
                     Conocer Más
                   </Button>
                 </Link>
@@ -102,12 +102,12 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative"
             >
-              <div className="relative w-full h-96 rounded-2xl overflow-hidden shadow-2xl">
+              <div className="relative w-full h-96 rounded-2xl overflow-hidden shadow-2xl shadow-blue-500/20">
                 <Image
                   src="/logo.png"
                   alt="GlobalStore Platform"
                   fill
-                  className="object-contain p-12 bg-gradient-to-br from-blue-100 to-purple-100"
+                  className="object-contain p-12 bg-gradient-to-br from-gray-800 to-gray-900"
                 />
               </div>
             </motion.div>
@@ -115,18 +115,18 @@ export default function HomePage() {
         </div>
 
         {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-white">
+      <section id="features" className="py-20 bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-white mb-4">
               Todo lo que necesitas
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-400">
               Una plataforma completa para cada tipo de usuario
             </p>
           </div>
@@ -139,15 +139,15 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-xl hover:shadow-lg transition-shadow"
+                className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl hover:shadow-lg hover:shadow-blue-500/20 transition-all border border-gray-800"
               >
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center text-white mb-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 rounded-lg flex items-center justify-center text-white mb-4">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                <h3 className="text-xl font-bold text-white mb-2">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600">{feature.description}</p>
+                <p className="text-gray-400">{feature.description}</p>
               </motion.div>
             ))}
           </div>
@@ -155,32 +155,32 @@ export default function HomePage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 bg-gradient-to-br from-blue-600 to-purple-600 text-white">
+      <section className="py-20 bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl font-bold mb-6">
+              <h2 className="text-4xl font-bold text-white mb-6">
                 ¿Por qué GlobalStore?
               </h2>
-              <p className="text-xl text-blue-100 mb-8">
+              <p className="text-xl text-blue-200 mb-8">
                 La solución completa para modernizar tu negocio
               </p>
               <div className="grid grid-cols-2 gap-4">
                 {benefits.map((benefit, index) => (
                   <div key={index} className="flex items-start space-x-2">
-                    <Check className="w-5 h-5 text-green-300 flex-shrink-0 mt-1" />
-                    <span className="text-blue-50">{benefit}</span>
+                    <Check className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-1" />
+                    <span className="text-gray-200">{benefit}</span>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8">
-              <h3 className="text-2xl font-bold mb-4">Comienza hoy</h3>
-              <p className="text-blue-100 mb-6">
+            <div className="bg-gray-900/50 backdrop-blur-lg rounded-2xl p-8 border border-gray-800">
+              <h3 className="text-2xl font-bold text-white mb-4">Comienza hoy</h3>
+              <p className="text-gray-300 mb-6">
                 Únete a miles de usuarios que ya confían en GlobalStore
               </p>
               <Link href="/register">
-                <Button size="lg" className="w-full bg-white text-blue-600 hover:bg-gray-100">
+                <Button size="lg" className="w-full">
                   Crear Cuenta Gratis
                 </Button>
               </Link>
@@ -190,7 +190,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-950 text-white py-12 border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-3 mb-4 md:mb-0">
