@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
+    "test": "jest --coverage --collectCoverageFrom='src/routes/**' --collectCoverageFrom='src/utils/validators.js' --collectCoverageFrom='src/middlewares/rateLimit.js' --collectCoverageFrom='src/app.js'",
+    "test:all": "jest --coverage",
     "test:watch": "jest --watch",
     "test:unit": "jest --testPathPattern=test/unit",
     "test:integration": "jest --testPathPattern=test/integration"
