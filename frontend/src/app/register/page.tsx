@@ -142,28 +142,28 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Progress Bar */}
-                <div className="mb-8">
+                <div className="mb-8 bg-gray-800/50 rounded-xl p-6 border border-gray-700">
                     <div className="flex justify-between items-center">
                         {[1, 2, 3, 4].map((s) => (
                             <div key={s} className="flex items-center flex-1">
                                 <div
-                                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${s <= step
-                                        ? 'bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 text-white'
-                                        : 'bg-gray-700 text-gray-500'
+                                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all shadow-lg ${s <= step
+                                        ? 'bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 text-white shadow-blue-500/50'
+                                        : 'bg-gray-800 text-gray-500 border-2 border-gray-600'
                                         }`}
                                 >
                                     {s < step ? <Check className="w-5 h-5" /> : s}
                                 </div>
                                 {s < 4 && (
                                     <div
-                                        className={`flex-1 h-1 mx-2 transition-all ${s < step ? 'bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600' : 'bg-gray-700'
+                                        className={`flex-1 h-1 mx-2 transition-all rounded-full ${s < step ? 'bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600' : 'bg-gray-700'
                                             }`}
                                     />
                                 )}
                             </div>
                         ))}
                     </div>
-                    <div className="flex justify-between mt-2 text-sm text-gray-400">
+                    <div className="flex justify-between mt-3 text-sm font-medium text-gray-300">
                         <span>Rol</span>
                         <span>Datos</span>
                         <span>Detalles</span>
@@ -404,7 +404,7 @@ export default function RegisterPage() {
                             </Button>
                         ) : (
                             <Link href="/login">
-                                <Button variant="ghost">¿Ya tienes cuenta?</Button>
+                                <Button variant="ghost">¿Ya tienes cuenta? Iniciar Sesión</Button>
                             </Link>
                         )}
 
