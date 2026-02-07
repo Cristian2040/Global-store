@@ -403,9 +403,12 @@ export default function RegisterPage() {
                                 Atrás
                             </Button>
                         ) : (
-                            <Link href="/login">
-                                <Button variant="ghost">¿Ya tienes cuenta? Iniciar Sesión</Button>
-                            </Link>
+                            <div className="text-gray-400">
+                                ¿Ya tienes cuenta?{' '}
+                                <Link href="/login" className="font-semibold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent hover:from-cyan-300 hover:via-blue-400 hover:to-purple-400">
+                                    Iniciar Sesión
+                                </Link>
+                            </div>
                         )}
 
                         {step < 4 ? (
