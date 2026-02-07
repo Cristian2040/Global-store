@@ -127,18 +127,18 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-12 px-4">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-purple-950 py-12 px-4">
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center space-x-3 mb-4">
                         <Image src="/logo.png" alt="GlobalStore" width={48} height={48} />
-                        <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        <span className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
                             GlobalStore
                         </span>
                     </Link>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Crear Cuenta</h1>
-                    <p className="text-gray-600">Únete a nuestra comunidad</p>
+                    <h1 className="text-3xl font-bold text-white mb-2">Crear Cuenta</h1>
+                    <p className="text-gray-300">Únete a nuestra comunidad</p>
                 </div>
 
                 {/* Progress Bar */}
@@ -148,22 +148,22 @@ export default function RegisterPage() {
                             <div key={s} className="flex items-center flex-1">
                                 <div
                                     className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${s <= step
-                                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                                            : 'bg-gray-200 text-gray-500'
+                                        ? 'bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 text-white'
+                                        : 'bg-gray-700 text-gray-500'
                                         }`}
                                 >
                                     {s < step ? <Check className="w-5 h-5" /> : s}
                                 </div>
                                 {s < 4 && (
                                     <div
-                                        className={`flex-1 h-1 mx-2 transition-all ${s < step ? 'bg-gradient-to-r from-blue-600 to-purple-600' : 'bg-gray-200'
+                                        className={`flex-1 h-1 mx-2 transition-all ${s < step ? 'bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600' : 'bg-gray-700'
                                             }`}
                                     />
                                 )}
                             </div>
                         ))}
                     </div>
-                    <div className="flex justify-between mt-2 text-sm text-gray-600">
+                    <div className="flex justify-between mt-2 text-sm text-gray-400">
                         <span>Rol</span>
                         <span>Datos</span>
                         <span>Detalles</span>
@@ -174,7 +174,7 @@ export default function RegisterPage() {
                 {/* Form Card */}
                 <Card className="p-8">
                     {error && (
-                        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
+                        <div className="mb-6 p-4 bg-red-900/50 border border-red-700 rounded-lg text-red-300">
                             {error}
                         </div>
                     )}
@@ -183,8 +183,8 @@ export default function RegisterPage() {
                     {step === 1 && (
                         <div className="space-y-6">
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900 mb-2">Selecciona tu rol</h2>
-                                <p className="text-gray-600">¿Cómo quieres usar GlobalStore?</p>
+                                <h2 className="text-2xl font-bold text-white mb-2">Selecciona tu rol</h2>
+                                <p className="text-gray-400">¿Cómo quieres usar GlobalStore?</p>
                             </div>
 
                             <div className="grid md:grid-cols-3 gap-4">
@@ -193,15 +193,15 @@ export default function RegisterPage() {
                                         key={role.value}
                                         onClick={() => setFormData({ ...formData, role: role.value })}
                                         className={`cursor-pointer p-6 rounded-xl border-2 transition-all ${formData.role === role.value
-                                                ? 'border-blue-500 bg-blue-50'
-                                                : 'border-gray-200 hover:border-gray-300'
+                                            ? 'border-cyan-500 bg-cyan-500/10'
+                                            : 'border-gray-700 hover:border-gray-600'
                                             }`}
                                     >
                                         <div className={`w-16 h-16 rounded-lg bg-gradient-to-r ${role.color} flex items-center justify-center text-white mb-4`}>
                                             {role.icon}
                                         </div>
-                                        <h3 className="text-lg font-bold text-gray-900 mb-2">{role.title}</h3>
-                                        <p className="text-sm text-gray-600">{role.description}</p>
+                                        <h3 className="text-lg font-bold text-white mb-2">{role.title}</h3>
+                                        <p className="text-sm text-gray-400">{role.description}</p>
                                     </div>
                                 ))}
                             </div>
@@ -212,8 +212,8 @@ export default function RegisterPage() {
                     {step === 2 && (
                         <div className="space-y-6">
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900 mb-2">Información básica</h2>
-                                <p className="text-gray-600">Crea tu cuenta de usuario</p>
+                                <h2 className="text-2xl font-bold text-white mb-2">Información básica</h2>
+                                <p className="text-gray-400">Crea tu cuenta de usuario</p>
                             </div>
 
                             <div className="space-y-4">
@@ -261,12 +261,12 @@ export default function RegisterPage() {
                     {step === 3 && (
                         <div className="space-y-6">
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                                <h2 className="text-2xl font-bold text-white mb-2">
                                     {formData.role === 'customer' && 'Información adicional'}
                                     {formData.role === 'store' && 'Datos de tu tienda'}
                                     {formData.role === 'supplier' && 'Datos de tu empresa'}
                                 </h2>
-                                <p className="text-gray-600">Completa tu perfil</p>
+                                <p className="text-gray-400">Completa tu perfil</p>
                             </div>
 
                             <div className="space-y-4">
@@ -350,44 +350,44 @@ export default function RegisterPage() {
                     {step === 4 && (
                         <div className="space-y-6">
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900 mb-2">Confirma tu información</h2>
-                                <p className="text-gray-600">Revisa que todo esté correcto</p>
+                                <h2 className="text-2xl font-bold text-white mb-2">Confirma tu información</h2>
+                                <p className="text-gray-400">Revisa que todo esté correcto</p>
                             </div>
 
-                            <div className="bg-gray-50 rounded-lg p-6 space-y-4">
+                            <div className="bg-gray-900/50 rounded-lg p-6 space-y-4 border border-gray-700">
                                 <div>
-                                    <p className="text-sm text-gray-600">Rol</p>
-                                    <p className="font-semibold text-gray-900 capitalize">{formData.role}</p>
+                                    <p className="text-sm text-gray-500">Rol</p>
+                                    <p className="font-semibold text-white capitalize">{formData.role}</p>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-600">Usuario</p>
-                                    <p className="font-semibold text-gray-900">{formData.username}</p>
+                                    <p className="text-sm text-gray-500">Usuario</p>
+                                    <p className="font-semibold text-white">{formData.username}</p>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-600">Email</p>
-                                    <p className="font-semibold text-gray-900">{formData.email}</p>
+                                    <p className="text-sm text-gray-500">Email</p>
+                                    <p className="font-semibold text-white">{formData.email}</p>
                                 </div>
                                 {formData.role === 'store' && (
                                     <>
                                         <div>
-                                            <p className="text-sm text-gray-600">Tienda</p>
-                                            <p className="font-semibold text-gray-900">{formData.storeName}</p>
+                                            <p className="text-sm text-gray-500">Tienda</p>
+                                            <p className="font-semibold text-white">{formData.storeName}</p>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-gray-600">Propietario</p>
-                                            <p className="font-semibold text-gray-900">{formData.ownerName}</p>
+                                            <p className="text-sm text-gray-500">Propietario</p>
+                                            <p className="font-semibold text-white">{formData.ownerName}</p>
                                         </div>
                                     </>
                                 )}
                                 {formData.role === 'supplier' && (
                                     <>
                                         <div>
-                                            <p className="text-sm text-gray-600">Empresa</p>
-                                            <p className="font-semibold text-gray-900">{formData.companyName}</p>
+                                            <p className="text-sm text-gray-500">Empresa</p>
+                                            <p className="font-semibold text-white">{formData.companyName}</p>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-gray-600">Contacto</p>
-                                            <p className="font-semibold text-gray-900">{formData.supplierName}</p>
+                                            <p className="text-sm text-gray-500">Contacto</p>
+                                            <p className="font-semibold text-white">{formData.supplierName}</p>
                                         </div>
                                     </>
                                 )}

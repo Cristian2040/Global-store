@@ -29,24 +29,24 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center py-12 px-4">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-purple-950 flex items-center justify-center py-12 px-4">
             <div className="max-w-md w-full">
                 {/* Header */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center space-x-3 mb-4">
                         <Image src="/logo.png" alt="GlobalStore" width={48} height={48} />
-                        <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        <span className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
                             GlobalStore
                         </span>
                     </Link>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Iniciar Sesión</h1>
-                    <p className="text-gray-600">Bienvenido de vuelta</p>
+                    <h1 className="text-3xl font-bold text-white mb-2">Iniciar Sesión</h1>
+                    <p className="text-gray-300">Bienvenido de vuelta</p>
                 </div>
 
                 {/* Form Card */}
                 <Card className="p-8">
                     {error && (
-                        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
+                        <div className="mb-6 p-4 bg-red-900/50 border border-red-700 rounded-lg text-red-300">
                             {error}
                         </div>
                     )}
@@ -76,9 +76,9 @@ export default function LoginPage() {
                     </form>
 
                     <div className="mt-6 text-center">
-                        <p className="text-gray-600">
+                        <p className="text-gray-400">
                             ¿No tienes cuenta?{' '}
-                            <Link href="/register" className="text-blue-600 hover:text-blue-700 font-semibold">
+                            <Link href="/register" className="text-cyan-400 hover:text-cyan-300 font-semibold">
                                 Regístrate aquí
                             </Link>
                         </p>
