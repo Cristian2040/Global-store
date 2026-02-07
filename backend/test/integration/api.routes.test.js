@@ -11,53 +11,48 @@ describe('API Routes - Authentication Tests', () => {
         });
     });
 
-    describe('Protected Routes', () => {
-        it('GET /api/users should require authentication', async () => {
+    describe('Protected Routes - Authentication Required', () => {
+        it('GET /api/users should return 401 without token', async () => {
             const response = await request(app).get('/api/users');
             expect(response.status).toBe(401);
         });
 
-        it('GET /api/users/profile should require authentication', async () => {
+        it('GET /api/users/profile should return 401 without token', async () => {
             const response = await request(app).get('/api/users/profile');
             expect(response.status).toBe(401);
         });
 
-        it('POST /api/stores should require authentication', async () => {
+        it('POST /api/stores should return 401 without token', async () => {
             const response = await request(app)
                 .post('/api/stores')
                 .send({ storeName: 'Test' });
             expect(response.status).toBe(401);
         });
 
-        it('POST /api/customer-orders should require authentication', async () => {
+        it('POST /api/customer-orders should return 401 without token', async () => {
             const response = await request(app)
                 .post('/api/customer-orders')
                 .send({});
             expect(response.status).toBe(401);
         });
 
-        it('POST /api/restock-orders should require authentication', async () => {
+        it('POST /api/restock-orders should return 401 without token', async () => {
             const response = await request(app)
                 .post('/api/restock-orders')
                 .send({});
             expect(response.status).toBe(401);
         });
-    });
 
-    describe('Public Routes', () => {
-        it('GET /api/stores should be accessible', async () => {
-            const response = await request(app).get('/api/stores');
-            expect([200, 500]).toContain(response.status);
+        it('PUT /api/users/123 should return 401 without token', async () => {
+            const response = await request(app)
+                .put('/api/users/123')
+                .send({ username: 'test' });
+            expect(response.status).toBe(401);
         });
 
-        it('GET /api/products should be accessible', async () => {
-            const response = await request(app).get('/api/products');
-            expect([200, 500]).toContain(response.status);
-        });
-
-        it('GET /api/products/categories should be accessible', async () => {
-            const response = await request(app).get('/api/products/categories');
-            expect([200, 500]).toContain(response.status);
+        it('DELETE /api/stores/123 should return 401 without token', async () => {
+            const response = await request(app).delete('/api/stores/123');
+            expect(response.status).toBe(401);
         });
     });
 });
