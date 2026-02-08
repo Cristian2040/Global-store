@@ -2,6 +2,8 @@ const RestockOrder = require('../models/RestockOrder');
 const Store = require('../models/Store');
 const Supplier = require('../models/Supplier');
 const Product = require('../models/Product');
+const SupplierProduct = require('../models/SupplierProduct');
+const StoreProduct = require('../models/StoreProduct');
 const AppError = require('../utils/AppError');
 const logger = require('../utils/logger');
 const bcrypt = require('bcryptjs');
@@ -23,7 +25,7 @@ class RestockOrderService {
             throw new AppError('Supplier not found or inactive', 404);
         }
 
-        // Enrich items with product snapshots
+        // Enrich items with product snapshots and check/deduct stock
         const enrichedItems = [];
         let subtotalCents = 0;
 
@@ -33,6 +35,20 @@ class RestockOrderService {
             if (!product) {
                 throw new AppError(`Product ${item.productId} not found`, 404);
             }
+
+            // Check Supplier Stock
+            const supplierProduct = await SupplierProduct.findOne({ supplierId, productId: item.productId });
+            if (!supplierProduct) {
+                throw new AppError(`Supplier does not carry product ${product.name}`, 400);
+            }
+
+            if (supplierProduct.availableQuantity < item.quantity) {
+                throw new AppError(`Insufficient stock for ${product.name}. Available: ${supplierProduct.availableQuantity}`, 400);
+            }
+
+            // Deduct Stock
+            supplierProduct.availableQuantity -= item.quantity;
+            await supplierProduct.save();
 
             const itemSubtotal = item.unitPriceCents * item.quantity;
             subtotalCents += itemSubtotal;
@@ -69,14 +85,15 @@ class RestockOrderService {
             delivery,
             deliveryCode: hashedCode,
             createdByUserId,
-            history: [{ status: 'CREADA', at: new Date(), byUserId: createdByUserId }]
+            status: 'ENVIADA',
+            history: [{ status: 'ENVIADA', at: new Date(), byUserId: createdByUserId }]
         });
 
-        logger.info('Restock order created', { orderId: order._id, storeId, supplierId, deliveryCode });
+        logger.info('Restock order created', { orderId: order._id, storeId, supplierId });
 
         return {
             order: await RestockOrder.findById(order._id).populate('storeId').populate('supplierId'),
-            deliveryCode // Return plain code once for store to save
+            deliveryCode
         };
     }
 
@@ -137,12 +154,54 @@ class RestockOrderService {
             throw new AppError('Order not found', 404);
         }
 
-        order.status = status;
-        order.history.push({ status, at: new Date(), byUserId: userId, reason });
+        const oldStatus = order.status;
 
-        if (status === 'ENTREGADA') {
+        // Refund stock if rejected or cancelled (only if it wasn't already rejected/cancelled)
+        if ((status === 'RECHAZADA' || status === 'CANCELADA') &&
+            oldStatus !== 'RECHAZADA' && oldStatus !== 'CANCELADA') {
+
+            for (const item of order.items) {
+                const supplierProduct = await SupplierProduct.findOne({
+                    supplierId: order.supplierId,
+                    productId: item.productId
+                });
+
+                if (supplierProduct) {
+                    supplierProduct.availableQuantity += item.quantity;
+                    await supplierProduct.save();
+                }
+            }
+        }
+
+        // Add to Store Stock if Delivered
+        if (status === 'ENTREGADA' && oldStatus !== 'ENTREGADA') {
+            for (const item of order.items) {
+                let storeProduct = await StoreProduct.findOne({
+                    storeId: order.storeId,
+                    productId: item.productId
+                });
+
+                if (storeProduct) {
+                    storeProduct.availableQuantity += item.quantity;
+                    // Optional: Update base price to latest cost? Keeping simple for now.
+                    await storeProduct.save();
+                } else {
+                    // Create new Store Product
+                    await StoreProduct.create({
+                        storeId: order.storeId,
+                        productId: item.productId,
+                        basePriceCents: item.unitPriceCents,
+                        finalPriceCents: Math.round(item.unitPriceCents * 1.3), // Default 30% margin
+                        availableQuantity: item.quantity,
+                        active: true
+                    });
+                }
+            }
             order.delivery.deliveredAt = new Date();
         }
+
+        order.status = status;
+        order.history.push({ status, at: new Date(), byUserId: userId, reason });
 
         await order.save();
 
@@ -158,8 +217,8 @@ class RestockOrderService {
             throw new AppError('Order not found', 404);
         }
 
-        if (order.status !== 'ENVIADA') {
-            throw new AppError('Order must be in ENVIADA status', 400);
+        if (!['CREADA', 'ENVIADA'].includes(order.status)) {
+            throw new AppError('Order must be in CREADA or ENVIADA status', 400);
         }
 
         order.supplierConfirmedByUserId = userId;
@@ -168,6 +227,16 @@ class RestockOrderService {
     }
 
     async rejectOrder(orderId, reason, userId) {
+        const order = await RestockOrder.findById(orderId);
+
+        if (!order) {
+            throw new AppError('Order not found', 404);
+        }
+
+        if (!['CREADA', 'ENVIADA'].includes(order.status)) {
+            throw new AppError('Order must be in CREADA or ENVIADA status', 400);
+        }
+
         return await this.updateStatus(orderId, 'RECHAZADA', reason, userId);
     }
 

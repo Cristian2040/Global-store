@@ -11,12 +11,19 @@ import api from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface Supplier {
-    id: number;
+    _id: string;
     name: string;
-    description: string;
-    productsCount: number;
-    rating: number;
-    deliveryTime: string;
+    companyName: string;
+    email: string;
+    phone: string;
+    categories: string[];
+    route?: {
+        street?: string;
+        neighborhood?: string;
+        municipality?: string;
+        state?: string;
+        country?: string;
+    };
 }
 
 interface SupplierProduct {
@@ -29,6 +36,7 @@ interface SupplierProduct {
     unit: string;
     available: boolean;
     availableQuantity: number;
+    image?: string;
 }
 
 export default function SuppliersPage() {
@@ -50,29 +58,6 @@ export default function SuppliersPage() {
 
                 const response = await api.get(endpoint);
                 if (response.data.success) {
-                    // data.data is the array from paginated response? 
-                    // Wait, controller returns paginated response: { suppliers, pagination }
-                    // So response.data.data.suppliers is the array if using 'paginated' helper?
-                    // Let's check controller. 
-                    // Controller calls: paginated(res, result.suppliers, result.pagination, ...)
-                    // responseHandler.paginated structure: { success: true, message: ..., data: { docs: [], ... } } OR similar?
-                    // Let's assume standard structure: data: { docs: suppliers, ... } or just data: suppliers if plain?
-                    // Actually, let's look at `paginated` helper generally used here.
-                    // Usually it returns `data: { docs: [...], page: ... }` or `data: [...]`.
-                    // The service returns `{ suppliers, pagination }`.
-                    // The controller passes `result.suppliers` as first arg to `paginated`.
-                    // Let's assume response.data.data IS the array based on typical usage, 
-                    // OR response.data.data.docs. 
-                    // Check previous successful fetch in other files? 
-                    // Let's just log and see, or handle both.
-                    // For now, let's assume response.data.data is the list or try to destructure.
-
-                    // Actually, looking at previous artifacts/logs, `paginated` usually wraps it. 
-                    // If I look at `StoreService.getAll` it returns { stores, pagination }.
-                    // StoreController uses `paginated(res, result.stores, ...)`
-                    // If standard `paginated` is used, the response.data.data might be the array directly? 
-                    // No, usually paginated returns an object with `docs` or `items`.
-                    // To be safe: 
                     const data = response.data.data;
                     if (Array.isArray(data)) {
                         setSuppliers(data);
@@ -100,13 +85,16 @@ export default function SuppliersPage() {
 
     const [supplierProducts, setSupplierProducts] = useState<SupplierProduct[]>([]);
     const [loadingProducts, setLoadingProducts] = useState(false);
+    const [activeTab, setActiveTab] = useState<'info' | 'products'>('info');
 
     // Fetch supplier products when a supplier is selected
     useEffect(() => {
         if (selectedSupplier?._id) {
+            setActiveTab('info'); // Reset to info tab on open
             const fetchProducts = async () => {
                 setLoadingProducts(true);
                 try {
+                    // ... (rest of fetch logic)
                     const response = await api.get(`/suppliers/${selectedSupplier._id}/products`);
                     if (response.data.success) {
                         setSupplierProducts(response.data.data);
@@ -210,76 +198,190 @@ export default function SuppliersPage() {
                 )}
             </div>
 
-            {/* Supplier Products Modal */}
+            {/* Supplier Details Modal */}
             <Modal
                 isOpen={!!selectedSupplier}
                 onClose={() => setSelectedSupplier(null)}
-                title={`Catálogo de ${selectedSupplier?.name}`}
+                title={selectedSupplier ? `Detalles de ${selectedSupplier.name}` : 'Detalles del Proveedor'}
                 size="xl"
             >
                 {selectedSupplier && (
-                    <div className="space-y-4">
-                        {loadingProducts ? (
-                            <div className="text-center py-8">Cargando productos...</div>
-                        ) : supplierProducts.length === 0 ? (
-                            <div className="text-center py-8 text-gray-400">
-                                Este proveedor no tiene productos disponibles.
-                            </div>
-                        ) : (
-                            <div className="grid md:grid-cols-2 gap-4">
-                                {supplierProducts.map((product) => (
-                                    <div key={product._id} className="p-4 bg-gray-800 rounded-lg border border-gray-700">
-                                        <div className="flex items-start justify-between mb-3">
-                                            <div>
-                                                <h4 className="text-white font-semibold">{product.name}</h4>
-                                                <p className="text-sm text-gray-400">{product.category}</p>
-                                            </div>
-                                            {product.available ? (
-                                                <span className="px-2 py-1 text-xs font-semibold text-green-300 bg-green-900/50 border border-green-700 rounded-full">
-                                                    Disponible
-                                                </span>
-                                            ) : (
-                                                <span className="px-2 py-1 text-xs font-semibold text-gray-400 bg-gray-800 border border-gray-700 rounded-full">
-                                                    Agotado
-                                                </span>
-                                            )}
-                                        </div>
+                    <div className="space-y-6">
+                        {/* Tabs */}
+                        <div className="flex space-x-4 border-b border-gray-700 pb-2">
+                            <button
+                                className={`px-4 py-2 font-medium text-sm transition-colors ${activeTab === 'info'
+                                    ? 'text-cyan-400 border-b-2 border-cyan-400'
+                                    : 'text-gray-400 hover:text-white'
+                                    }`}
+                                onClick={() => setActiveTab('info')}
+                            >
+                                Información General
+                            </button>
+                            <button
+                                className={`px-4 py-2 font-medium text-sm transition-colors ${activeTab === 'products'
+                                    ? 'text-cyan-400 border-b-2 border-cyan-400'
+                                    : 'text-gray-400 hover:text-white'
+                                    }`}
+                                onClick={() => setActiveTab('products')}
+                            >
+                                Catálogo de Productos
+                            </button>
+                        </div>
 
-                                        <div className="flex items-center justify-between mb-3">
-                                            <div>
-                                                <p className="text-2xl font-bold text-cyan-400">
-                                                    ${product.price.toFixed(2)}
-                                                </p>
-                                                <p className="text-xs text-gray-500">por {product.unit}</p>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="text-sm text-gray-400">Disponibles</p>
-                                                <p className="text-white font-semibold">{product.availableQuantity}</p>
+                        {/* Content */}
+                        {activeTab === 'info' && (
+                            <div className="space-y-6 animate-in fade-in zoom-in duration-300">
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                        <div>
+                                            <h4 className="text-sm font-medium text-gray-400">Nombre del Encargado</h4>
+                                            <p className="text-lg text-white font-semibold">{selectedSupplier.name}</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-medium text-gray-400">Empresa</h4>
+                                            <p className="text-lg text-white font-semibold flex items-center">
+                                                <Building2 className="w-4 h-4 mr-2 text-cyan-400" />
+                                                {selectedSupplier.companyName}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-medium text-gray-400">Categorías</h4>
+                                            <div className="flex flex-wrap gap-2 mt-2">
+                                                {selectedSupplier.categories?.length > 0 ? (
+                                                    selectedSupplier.categories.map((cat: string, i: number) => (
+                                                        <span key={i} className="px-2 py-1 text-xs bg-gray-800 text-cyan-300 rounded-full border border-gray-700">
+                                                            {cat}
+                                                        </span>
+                                                    ))
+                                                ) : (
+                                                    <p className="text-gray-500 italic">Sin categorías</p>
+                                                )}
                                             </div>
                                         </div>
-
-                                        <Button
-                                            size="sm"
-                                            className="w-full"
-                                            disabled={!product.available}
-                                        >
-                                            <ShoppingCart className="w-4 h-4 mr-2" />
-                                            Agregar al Pedido
-                                        </Button>
                                     </div>
-                                ))}
+
+                                    <div className="space-y-4">
+                                        <div>
+                                            <h4 className="text-sm font-medium text-gray-400">Información de Contacto</h4>
+                                            <div className="mt-2 space-y-2">
+                                                <p className="text-gray-300 flex items-center">
+                                                    <span className="w-20 text-gray-500 text-xs uppercase">Email:</span>
+                                                    {selectedSupplier.email}
+                                                </p>
+                                                <p className="text-gray-300 flex items-center">
+                                                    <span className="w-20 text-gray-500 text-xs uppercase">Teléfono:</span>
+                                                    {selectedSupplier.phone}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <h4 className="text-sm font-medium text-gray-400">Ubicación / Ruta</h4>
+                                            <p className="text-gray-300 mt-1">
+                                                {(() => {
+                                                    const route = selectedSupplier.route;
+                                                    if (!route) return 'Dirección no disponible';
+                                                    const parts = [route.street, route.neighborhood, route.municipality, route.state, route.country];
+                                                    return parts.filter(Boolean).join(', ');
+                                                })()}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-end pt-4">
+                                    <Button onClick={() => setActiveTab('products')}>
+                                        <ShoppingCart className="w-4 h-4 mr-2" />
+                                        Ver Productos Disponibles
+                                    </Button>
+                                </div>
                             </div>
                         )}
 
-                        <div className="border-t border-gray-700 pt-4 flex justify-end gap-3">
-                            <Button variant="outline" onClick={() => setSelectedSupplier(null)}>
-                                Cerrar
-                            </Button>
-                            <Button disabled={supplierProducts.length === 0}>
-                                <ShoppingCart className="w-4 h-4 mr-2" />
-                                Crear Pedido
-                            </Button>
-                        </div>
+                        {activeTab === 'products' && (
+                            <div className="space-y-4 animate-in fade-in zoom-in duration-300">
+                                {loadingProducts ? (
+                                    <div className="text-center py-8">Cargando productos...</div>
+                                ) : supplierProducts.length === 0 ? (
+                                    <div className="text-center py-12 bg-gray-800/50 rounded-lg">
+                                        <Package className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+                                        <p className="text-gray-400">Este proveedor no tiene productos disponibles actualmente.</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto pr-2">
+                                        {supplierProducts.map((product) => (
+                                            <div key={product._id} className="p-4 bg-gray-800 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
+                                                <div className="flex gap-4">
+                                                    <div className="w-16 h-16 bg-gray-700 rounded-lg flex-shrink-0 overflow-hidden">
+                                                        {product.image ? (
+                                                            <img
+                                                                src={product.image}
+                                                                alt={product.name}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-gray-500">
+                                                                <Package className="w-8 h-8 opacity-50" />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <div className="flex items-start justify-between mb-2">
+                                                            <div>
+                                                                <h4 className="text-white font-semibold line-clamp-1">{product.name}</h4>
+                                                                <p className="text-sm text-gray-400">{product.category}</p>
+                                                            </div>
+                                                            {product.available ? (
+                                                                <span className="px-2 py-1 text-xs font-semibold text-green-300 bg-green-900/50 border border-green-700 rounded-full whitespace-nowrap">
+                                                                    Disponible
+                                                                </span>
+                                                            ) : (
+                                                                <span className="px-2 py-1 text-xs font-semibold text-gray-400 bg-gray-800 border border-gray-700 rounded-full whitespace-nowrap">
+                                                                    Agotado
+                                                                </span>
+                                                            )}
+                                                        </div>
+
+                                                        <div className="flex items-center justify-between mb-3 mt-2">
+                                                            <div>
+                                                                <p className="text-2xl font-bold text-cyan-400">
+                                                                    ${product.price ? product.price.toFixed(2) : '0.00'}
+                                                                </p>
+                                                                <p className="text-xs text-gray-500">por {product.unit}</p>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <p className="text-sm text-gray-400">Stock</p>
+                                                                <p className="text-white font-semibold">{product.availableQuantity}</p>
+                                                            </div>
+                                                        </div>
+
+                                                        <Button
+                                                            size="sm"
+                                                            className="w-full"
+                                                            disabled={!product.available}
+                                                        >
+                                                            <ShoppingCart className="w-4 h-4 mr-2" />
+                                                            Agregar
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                <div className="border-t border-gray-700 pt-4 flex justify-end gap-3">
+                                    <Button variant="outline" onClick={() => setSelectedSupplier(null)}>
+                                        Cerrar
+                                    </Button>
+                                    <Button disabled={supplierProducts.length === 0}>
+                                        <ShoppingCart className="w-4 h-4 mr-2" />
+                                        Crear Pedido
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
             </Modal>

@@ -50,6 +50,53 @@ class StoreProductService {
         return products;
     }
 
+    async getAll(filters = {}, pagination = {}) {
+        const { search, category, minPrice, maxPrice } = filters;
+        const { page = 1, limit = 20 } = pagination;
+
+        const query = { active: true, availableQuantity: { $gt: 0 } };
+
+        // If filtering by product properties (name, category), we might need to filter after population or use aggregate
+        // For better performance with large datasets, we should find matching Product IDs first
+        if (search || category) {
+            const productQuery = {};
+            if (search) productQuery.name = { $regex: search, $options: 'i' };
+            if (category && category !== 'Todas las categorías') productQuery.category = category;
+
+            const matchingProducts = await Product.find(productQuery).select('_id');
+            const matchingProductIds = matchingProducts.map(p => p._id);
+
+            if (matchingProductIds.length > 0) {
+                query.productId = { $in: matchingProductIds };
+            } else {
+                return { products: [], pagination: { page, limit, total: 0 } };
+            }
+        }
+
+        if (minPrice !== undefined || maxPrice !== undefined) {
+            query.finalPriceCents = {};
+            if (minPrice !== undefined) query.finalPriceCents.$gte = minPrice * 100;
+            if (maxPrice !== undefined) query.finalPriceCents.$lte = maxPrice * 100;
+        }
+
+        const skip = (page - 1) * limit;
+
+        const [products, total] = await Promise.all([
+            StoreProduct.find(query)
+                .populate('productId')
+                .populate('storeId', 'storeName logo address')
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+            StoreProduct.countDocuments(query)
+        ]);
+
+        return {
+            products,
+            pagination: { page: parseInt(page), limit: parseInt(limit), total }
+        };
+    }
+
     async getById(storeProductId) {
         const storeProduct = await StoreProduct.findById(storeProductId)
             .populate('productId')
