@@ -8,6 +8,7 @@ const Joi = require('joi');
 
 router.get('/', supplierController.getAll);
 router.get('/:id', validate(Joi.object({ id: objectId.required() }), 'params'), supplierController.getById);
+router.get('/:id/products', validate(Joi.object({ id: objectId.required() }), 'params'), supplierController.getProducts);
 
 router.use(authenticate);
 
