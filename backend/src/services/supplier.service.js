@@ -36,10 +36,17 @@ class SupplierService {
         if (category) query.categories = category;
         if (companyName) query.companyName = companyName; // Apply companyName filter
         if (search) {
-            query.$or = [
+            const searchConditions = [
                 { name: { $regex: search, $options: 'i' } },
                 { companyName: { $regex: search, $options: 'i' } }
             ];
+
+            // If search is a valid ObjectId, add it to conditions
+            if (search.match(/^[0-9a-fA-F]{24}$/)) {
+                searchConditions.push({ _id: search });
+            }
+
+            query.$or = searchConditions;
         }
 
         const skip = (page - 1) * limit;
@@ -107,6 +114,26 @@ class SupplierService {
         }
 
         logger.info('Supplier deactivated', { supplierId });
+    }
+
+    async getProducts(supplierId) {
+        const SupplierProduct = require('../models/SupplierProduct');
+        const products = await SupplierProduct.find({ supplierId })
+            .populate('productId', 'name category unit description image');
+
+        return products.map(sp => ({
+            _id: sp._id,
+            productId: sp.productId._id,
+            name: sp.productId.name,
+            category: sp.productId.category,
+            unit: sp.productId.unit,
+            description: sp.productId.description,
+            image: sp.productId.image,
+            price: sp.basePriceCents / 100, // Convert to main currency unit
+            minOrder: 1, // Default or add to model if needed
+            available: sp.availableQuantity > 0,
+            availableQuantity: sp.availableQuantity
+        }));
     }
 }
 

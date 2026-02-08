@@ -68,6 +68,7 @@ const userValidators = {
     update: Joi.object({
         username: Joi.string().min(2).max(50).trim(),
         email: email,
+        phone: Joi.string().trim(),
         address: addressSchema,
         active: Joi.boolean()
     }).min(1),
@@ -257,7 +258,7 @@ const supplierProductValidators = {
 // ============================================
 const customerOrderValidators = {
     create: Joi.object({
-        customerId: objectId.required(),
+        // customerId comes from auth token
         storeId: objectId.required(),
         items: Joi.array().items(
             Joi.object({
@@ -293,7 +294,7 @@ const restockOrderValidators = {
     create: Joi.object({
         storeId: objectId.required(),
         supplierId: objectId.required(),
-        supplierRouteId: objectId.required(),
+        supplierRouteId: objectId, // Made optional
         requestedDayOfWeek: Joi.number().integer().min(1).max(7),
         items: Joi.array().items(
             Joi.object({
@@ -304,9 +305,9 @@ const restockOrderValidators = {
         ).min(1).required(),
         delivery: Joi.object({
             requestedDeliveryDate: Joi.date(),
-            notes: Joi.string().trim()
+            notes: Joi.string().trim().allow('') // Allow empty notes
         }),
-        notes: Joi.string().trim()
+        notes: Joi.string().trim().allow('') // Allow empty notes
     }),
 
     updateStatus: Joi.object({

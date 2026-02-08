@@ -16,6 +16,35 @@ class StoreProductController {
         success(res, products, 'Store products retrieved successfully');
     });
 
+    getAll = asyncHandler(async (req, res) => {
+        const filters = {
+            search: req.query.search,
+            category: req.query.category,
+            minPrice: req.query.minPrice,
+            maxPrice: req.query.maxPrice
+        };
+        const pagination = {
+            page: req.query.page,
+            limit: req.query.limit
+        };
+
+        const result = await storeProductService.getAll(filters, pagination);
+        // Using success for now as paginated helper structure might vary, or construct manual response
+        // Checking responseHandler... usually paginated(res, docs, paginationInfo, msg)
+        // Let's assume paginated helper exists locally imported in controller.
+        // Re-reading controller imports: const { success } = require('../utils/responseHandler');
+        // Need to add paginated to imports if not present.
+        // Wait, line 3 only imports success: const { success } = require('../utils/responseHandler');
+        // I should update imports too.
+
+        res.status(200).json({
+            success: true,
+            data: result.products,
+            pagination: result.pagination,
+            message: 'Global products retrieved successfully'
+        });
+    });
+
     getById = asyncHandler(async (req, res) => {
         const storeProduct = await storeProductService.getById(req.params.id);
         success(res, storeProduct, 'Store product retrieved successfully');

@@ -6,7 +6,8 @@ const addressSchema = new mongoose.Schema({
     municipality: String,
     neighborhood: String,
     street: String,
-    number: String
+    number: String,
+    notes: String
 }, { _id: false });
 
 const userSchema = new mongoose.Schema({
@@ -34,6 +35,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ["customer", "admin", "store", "supplier", "company"],
         default: "customer"
+    },
+    phone: {
+        type: String,
+        trim: true
     },
     address: addressSchema,
     active: {

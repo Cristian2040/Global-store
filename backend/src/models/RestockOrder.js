@@ -73,7 +73,7 @@ const restockOrderSchema = new mongoose.Schema(
         supplierRouteId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "SupplierRouteSchedule",
-            required: true,
+            required: false, // Changed from true to false: Store might not know the route initially
             index: true,
         },
 
@@ -157,7 +157,7 @@ const restockOrderSchema = new mongoose.Schema(
             type: String,
             trim: true,
             minlength: 4,
-            maxlength: 12,
+            maxlength: 100, // Increased to support bcrypt hash (usually 60 chars)
             select: false
         },
 

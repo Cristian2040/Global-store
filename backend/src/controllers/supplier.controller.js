@@ -40,6 +40,11 @@ class SupplierController {
         await supplierService.delete(req.params.id);
         success(res, null, 'Supplier deactivated successfully');
     });
+
+    getProducts = asyncHandler(async (req, res) => {
+        const products = await supplierService.getProducts(req.params.id);
+        success(res, products, 'Supplier products retrieved successfully');
+    });
 }
 
 module.exports = new SupplierController();

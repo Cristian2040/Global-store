@@ -54,7 +54,7 @@ export default function InventoryPage() {
     const fetchProducts = async () => {
         if (!relatedData?._id) return;
         try {
-            const response = await api.get(`/api/store-products/store/${relatedData._id}`);
+            const response = await api.get(`/store-products/store/${relatedData._id}`);
             if (response.data.success) {
                 setProducts(response.data.data);
             }
@@ -79,11 +79,9 @@ export default function InventoryPage() {
 
         setIsSearching(true);
         try {
-            // Assuming this endpoint exists and returns { data: { products: [] } } or similar
-            const response = await api.get(`/api/products?search=${term}&limit=5`);
+            const response = await api.get(`/products?search=${term}&limit=5`);
             if (response.data.success) {
-                // The structure is response.data.data based on pagination helper
-                setSearchResults(response.data.data || []);
+                setSearchResults(response.data.data.docs || response.data.data || []);
             }
         } catch (error) {
             console.error('Error searching products:', error);
@@ -103,7 +101,7 @@ export default function InventoryPage() {
 
         try {
             // 1. Create Global Product
-            const productResponse = await api.post('/api/products', newProductData);
+            const productResponse = await api.post('/products', newProductData);
             if (!productResponse.data.success) {
                 throw new Error('Error al crear el producto global');
             }
@@ -118,7 +116,7 @@ export default function InventoryPage() {
                 expiryDate: formData.expiryDate
             };
 
-            const response = await api.post('/api/store-products', payload);
+            const response = await api.post('/store-products', payload);
             if (response.data.success) {
                 toast.success('Producto creado y agregado al inventario');
                 setIsAddModalOpen(false);
@@ -143,7 +141,7 @@ export default function InventoryPage() {
                 expiryDate: formData.expiryDate
             };
 
-            const response = await api.post('/api/store-products', payload);
+            const response = await api.post('/store-products', payload);
             if (response.data.success) {
                 toast.success('Producto agregado al inventario');
                 setIsAddModalOpen(false);
@@ -165,7 +163,7 @@ export default function InventoryPage() {
                 expiryDate: formData.expiryDate
             };
 
-            const response = await api.put(`/api/store-products/${selectedProduct._id}`, payload);
+            const response = await api.put(`/store-products/${selectedProduct._id}`, payload);
             if (response.data.success) {
                 toast.success('Producto actualizado');
                 setIsEditModalOpen(false);
@@ -181,7 +179,7 @@ export default function InventoryPage() {
         if (!confirm('¿Estás seguro de que quieres eliminar este producto del inventario?')) return;
 
         try {
-            const response = await api.delete(`/api/store-products/${id}`);
+            const response = await api.delete(`/store-products/${id}`);
             if (response.data.success) {
                 toast.success('Producto eliminado');
                 fetchProducts();
@@ -228,7 +226,24 @@ export default function InventoryPage() {
         {
             key: 'name',
             header: 'Producto',
-            render: (item: StoreProduct) => item.productId.name
+            render: (item: StoreProduct) => (
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gray-700 rounded-md overflow-hidden flex-shrink-0">
+                        {item.productId.image ? (
+                            <img
+                                src={item.productId.image}
+                                alt={item.productId.name}
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-500">
+                                <Package className="w-5 h-5 opacity-50" />
+                            </div>
+                        )}
+                    </div>
+                    <span className="font-medium text-white">{item.productId.name}</span>
+                </div>
+            )
         },
         {
             key: 'category',
