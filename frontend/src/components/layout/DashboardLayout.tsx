@@ -5,7 +5,7 @@ import { DashboardNavbar } from './DashboardNavbar';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
-    role: 'customer' | 'store' | 'supplier' | 'admin';
+    role: 'customer' | 'store' | 'supplier' | 'admin' | 'company';
     title: string;
     showSearch?: boolean;
 }

@@ -29,8 +29,25 @@ const authValidators = {
         username: Joi.string().min(2).max(50).trim().required(),
         email: email.required(),
         password: password.required(),
-        role: Joi.string().valid('customer', 'admin', 'store', 'supplier').default('customer'),
-        address: addressSchema
+        role: Joi.string().valid('customer', 'admin', 'store', 'supplier', 'company').default('customer'),
+        address: addressSchema,
+        // Store specific
+        storeName: Joi.string().trim(),
+        ownerName: Joi.string().trim(),
+        storePhone: Joi.string().trim(),
+        storeAddress: addressSchema,
+        // Supplier specific
+        supplierName: Joi.string().trim(),
+        companyId: objectId,
+        supplierEmail: email,
+        supplierPhone: Joi.string().trim(),
+        categories: Joi.array().items(Joi.string().trim()),
+        // Company specific
+        companyName: Joi.string().trim(),
+        companyEmail: email,
+        companyPhone: Joi.string().trim(),
+        companyAddress: addressSchema,
+        description: Joi.string().trim()
     }),
 
     login: Joi.object({
@@ -56,7 +73,7 @@ const userValidators = {
     }).min(1),
 
     query: Joi.object({
-        role: Joi.string().valid('customer', 'admin', 'store', 'supplier'),
+        role: Joi.string().valid('customer', 'admin', 'store', 'supplier', 'company'),
         active: Joi.boolean(),
         page: Joi.number().integer().min(1).default(1),
         limit: Joi.number().integer().min(1).max(100).default(10),
@@ -74,17 +91,27 @@ const storeValidators = {
         userId: objectId.required(),
         description: Joi.string().max(500).trim(),
         address: addressSchema,
+        phone: Joi.string().trim(),
         schedule: Joi.string().trim(),
         logo: Joi.string().trim()
     }),
 
     update: Joi.object({
-        storeName: Joi.string().trim(),
-        ownerName: Joi.string().trim(),
-        description: Joi.string().max(500).trim(),
-        address: addressSchema,
-        schedule: Joi.string().trim(),
-        logo: Joi.string().trim(),
+        storeName: Joi.string().trim().allow(''),
+        ownerName: Joi.string().trim().allow(''),
+        description: Joi.string().max(500).trim().allow(''),
+        address: Joi.object({
+            country: Joi.string().trim().allow(''),
+            state: Joi.string().trim().allow(''),
+            municipality: Joi.string().trim().allow(''),
+            neighborhood: Joi.string().trim().allow(''),
+            street: Joi.string().trim().allow(''),
+            number: Joi.string().trim().allow(''),
+            notes: Joi.string().trim().allow('')
+        }),
+        phone: Joi.string().trim().allow(''),
+        schedule: Joi.string().trim().allow(''),
+        logo: Joi.string().trim().allow(''),
         rating: Joi.number().min(0).max(5),
         active: Joi.boolean()
     }).min(1),
@@ -175,7 +202,7 @@ const productValidators = {
     query: Joi.object({
         category: Joi.string().trim(),
         company: Joi.string().trim(),
-        search: Joi.string().trim(),
+        search: Joi.string().trim().allow(''),
         page: Joi.number().integer().min(1).default(1),
         limit: Joi.number().integer().min(1).max(100).default(10)
     })

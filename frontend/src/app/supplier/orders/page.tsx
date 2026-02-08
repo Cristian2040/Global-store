@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Table } from '@/components/ui/Table';
 import { Button } from '@/components/ui/Button';
 import { FileText, CheckCircle, XCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Order {
     id: number;
@@ -63,24 +64,24 @@ export default function SupplierOrdersPage() {
                 <div className="flex gap-2">
                     {order.status === 'pending' && (
                         <>
-                            <Button size="sm" variant="outline">
+                            <Button size="sm" variant="outline" onClick={() => toast.success(`Pedido #${order.orderNumber} aceptado`)}>
                                 <CheckCircle className="w-4 h-4 mr-1" />
                                 Aceptar
                             </Button>
-                            <Button size="sm" variant="outline" className="text-red-400 border-red-700 hover:bg-red-900/20">
+                            <Button size="sm" variant="outline" className="text-red-400 border-red-700 hover:bg-red-900/20" onClick={() => toast.error(`Pedido #${order.orderNumber} rechazado`)}>
                                 <XCircle className="w-4 h-4 mr-1" />
                                 Rechazar
                             </Button>
                         </>
                     )}
                     {order.status === 'accepted' && (
-                        <Button size="sm">Iniciar Preparación</Button>
+                        <Button size="sm" onClick={() => toast.info(`Iniciando preparación de pedido #${order.orderNumber}`)}>Iniciar Preparación</Button>
                     )}
                     {order.status === 'preparing' && (
-                        <Button size="sm">Marcar como Listo</Button>
+                        <Button size="sm" onClick={() => toast.success(`Pedido #${order.orderNumber} marcado como listo`)}>Marcar como Listo</Button>
                     )}
                     {order.status === 'ready' && (
-                        <Button size="sm" variant="outline">Ver Detalles</Button>
+                        <Button size="sm" variant="outline" onClick={() => toast.info(`Abriendo detalles de pedido #${order.orderNumber}`)}>Ver Detalles</Button>
                     )}
                 </div>
             ),

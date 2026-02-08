@@ -1,15 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { ShoppingBag, Store, Truck, Check, ArrowLeft, ArrowRight } from 'lucide-react';
+import { ShoppingBag, Store, Truck, Building2, Check, ArrowLeft, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { toast } from 'sonner';
 import type { RegisterFormData } from '@/types';
+
+import api from '@/lib/api';
 
 export default function RegisterPage() {
     const [step, setStep] = useState(1);
@@ -22,48 +25,79 @@ export default function RegisterPage() {
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [companies, setCompanies] = useState<{ _id: string, companyName: string }[]>([]);
     const { register } = useAuth();
     const router = useRouter();
+
+    useEffect(() => {
+        // Fetch companies for supplier registration
+        const fetchCompanies = async () => {
+            try {
+                const response = await api.get('/companies');
+                if (response.data.success) {
+                    setCompanies(response.data.data);
+                }
+            } catch (err) {
+                console.error('Error fetching companies:', err);
+            }
+        };
+        fetchCompanies();
+    }, []);
 
     const roles = [
         {
             value: 'customer' as const,
             title: 'Cliente',
             description: 'Compra productos de tiendas locales',
-            icon: <ShoppingBag className="w-12 h-12" />,
+            icon: <ShoppingBag className="w-10 h-10" />,
             color: 'from-blue-500 to-cyan-500',
         },
         {
             value: 'store' as const,
             title: 'Tienda',
             description: 'Vende productos y gestiona inventario',
-            icon: <Store className="w-12 h-12" />,
+            icon: <Store className="w-10 h-10" />,
             color: 'from-purple-500 to-pink-500',
         },
         {
             value: 'supplier' as const,
             title: 'Proveedor',
-            description: 'Suministra productos a tiendas',
-            icon: <Truck className="w-12 h-12" />,
+            description: 'Distribuye productos a tiendas',
+            icon: <Truck className="w-10 h-10" />,
             color: 'from-orange-500 to-red-500',
         },
+        {
+            value: 'company' as const,
+            title: 'Empresa',
+            description: 'Dueña de marca y productos globales',
+            icon: <Building2 className="w-10 h-10" />,
+            color: 'from-emerald-500 to-teal-500',
+        },
     ];
+
+    const handleRoleSelect = (roleId: string) => {
+        setFormData({ ...formData, role: roleId as any });
+    };
 
     const handleNext = () => {
         setError('');
 
+        if (step === 1 && !formData.role) {
+            toast.error('Por favor selecciona un rol');
+            return;
+        }
+
         if (step === 2) {
-            // Validate step 2
             if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
-                setError('Todos los campos son obligatorios');
+                toast.error('Todos los campos son obligatorios');
                 return;
             }
             if (formData.password !== formData.confirmPassword) {
-                setError('Las contraseñas no coinciden');
+                toast.error('Las contraseñas no coinciden');
                 return;
             }
             if (formData.password.length < 6) {
-                setError('La contraseña debe tener al menos 6 caracteres');
+                toast.error('La contraseña debe tener al menos 6 caracteres');
                 return;
             }
         }
@@ -72,12 +106,17 @@ export default function RegisterPage() {
             // Validate step 3 based on role
             if (formData.role === 'store') {
                 if (!formData.storeName || !formData.ownerName) {
-                    setError('Nombre de tienda y propietario son obligatorios');
+                    toast.error('Por favor completa todos los campos obligatorios de la tienda');
                     return;
                 }
             } else if (formData.role === 'supplier') {
-                if (!formData.companyName || !formData.supplierName) {
-                    setError('Nombre de empresa y contacto son obligatorios');
+                if (!formData.supplierName || !formData.companyId || !formData.supplierEmail || !formData.supplierPhone) {
+                    toast.error('Por favor completa todos los campos del proveedor y selecciona una empresa');
+                    return;
+                }
+            } else if (formData.role === 'company') {
+                if (!formData.companyName || !formData.companyEmail || !formData.companyPhone) {
+                    toast.error('Por favor completa todos los campos de la empresa');
                     return;
                 }
             }
@@ -97,7 +136,7 @@ export default function RegisterPage() {
 
         try {
             // Prepare data based on role
-            const submitData: any = {
+            let submitData: any = {
                 username: formData.username,
                 email: formData.email,
                 password: formData.password,
@@ -109,19 +148,31 @@ export default function RegisterPage() {
             } else if (formData.role === 'store') {
                 submitData.storeName = formData.storeName;
                 submitData.ownerName = formData.ownerName;
-                submitData.phone = formData.storePhone;
-                submitData.address = formData.storeAddress;
+                submitData.storePhone = formData.storePhone;
+                submitData.storeAddress = formData.storeAddress;
             } else if (formData.role === 'supplier') {
-                submitData.name = formData.supplierName;
-                submitData.companyName = formData.companyName;
-                submitData.email = formData.supplierEmail || formData.email;
-                submitData.phone = formData.supplierPhone;
+                submitData.supplierName = formData.supplierName;
+                submitData.companyId = formData.companyId;
+                // Find company name for complete data if needed locally, though backend doesn't strictly need it if we use companyId
+                const selectedCompany = companies.find(c => c._id === formData.companyId);
+                if (selectedCompany) {
+                    submitData.companyName = selectedCompany.companyName;
+                }
+                submitData.supplierEmail = formData.supplierEmail || formData.email;
+                submitData.supplierPhone = formData.supplierPhone;
                 submitData.categories = formData.categories || [];
+            } else if (formData.role === 'company') {
+                submitData.companyName = formData.companyName;
+                submitData.companyEmail = formData.companyEmail;
+                submitData.companyPhone = formData.companyPhone;
+                submitData.companyAddress = formData.companyAddress;
+                submitData.description = formData.description;
             }
 
             await register(submitData);
+            toast.success('¡Cuenta creada exitosamente!');
         } catch (err: any) {
-            setError(err.message);
+            toast.error(err.message || 'Error al crear la cuenta');
             setLoading(false);
         }
     };
@@ -155,8 +206,8 @@ export default function RegisterPage() {
                                 <div className="flex flex-col items-center relative min-w-[64px]">
                                     <div
                                         className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all z-10 ${s.id <= step
-                                                ? 'bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/30'
-                                                : 'bg-slate-900 text-gray-500 border-2 border-gray-600'
+                                            ? 'bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/30'
+                                            : 'bg-slate-900 text-gray-500 border-2 border-gray-600'
                                             }`}
                                     >
                                         {s.id < step ? <Check className="w- h-5" /> : s.id}
@@ -186,11 +237,7 @@ export default function RegisterPage() {
 
                 {/* Form Card */}
                 <Card className="p-8">
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-900/50 border border-red-700 rounded-lg text-red-300">
-                            {error}
-                        </div>
-                    )}
+
 
                     {/* Step 1: Role Selection */}
                     {step === 1 && (
@@ -200,21 +247,21 @@ export default function RegisterPage() {
                                 <p className="text-gray-400">¿Cómo quieres usar GlobalStore?</p>
                             </div>
 
-                            <div className="grid md:grid-cols-3 gap-4">
+                            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 {roles.map((role) => (
                                     <div
                                         key={role.value}
                                         onClick={() => setFormData({ ...formData, role: role.value })}
-                                        className={`cursor-pointer p-6 rounded-xl border-2 transition-all ${formData.role === role.value
+                                        className={`cursor-pointer p-4 rounded-xl border-2 transition-all ${formData.role === role.value
                                             ? 'border-cyan-500 bg-cyan-500/10'
                                             : 'border-gray-700 hover:border-gray-600'
                                             }`}
                                     >
-                                        <div className={`w-16 h-16 rounded-lg bg-gradient-to-r ${role.color} flex items-center justify-center text-white mb-4`}>
+                                        <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${role.color} flex items-center justify-center text-white mb-4 mx-auto`}>
                                             {role.icon}
                                         </div>
-                                        <h3 className="text-lg font-bold text-white mb-2">{role.title}</h3>
-                                        <p className="text-sm text-gray-400">{role.description}</p>
+                                        <h3 className="text-lg font-bold text-white mb-2 text-center">{role.title}</h3>
+                                        <p className="text-xs text-center text-gray-400">{role.description}</p>
                                     </div>
                                 ))}
                             </div>
@@ -278,6 +325,7 @@ export default function RegisterPage() {
                                     {formData.role === 'customer' && 'Información adicional'}
                                     {formData.role === 'store' && 'Datos de tu tienda'}
                                     {formData.role === 'supplier' && 'Datos de tu empresa'}
+                                    {formData.role === 'company' && 'Datos de tu empresa'}
                                 </h2>
                                 <p className="text-gray-400">Completa tu perfil</p>
                             </div>
@@ -331,27 +379,80 @@ export default function RegisterPage() {
                                 {formData.role === 'supplier' && (
                                     <>
                                         <Input
-                                            label="Nombre de la empresa"
+                                            label="Nombre del Proveedor / Vendedor"
+                                            value={formData.supplierName || ''}
+                                            onChange={(e) => setFormData({ ...formData, supplierName: e.target.value })}
+                                            required
+                                            placeholder="Tu nombre o nombre comercial"
+                                        />
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-300 mb-1">
+                                                Empresa a la que representas
+                                            </label>
+                                            <select
+                                                className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-white"
+                                                value={formData.companyId || ''}
+                                                onChange={(e) => setFormData({ ...formData, companyId: e.target.value })}
+                                                required
+                                            >
+                                                <option value="">Selecciona una empresa</option>
+                                                {companies.map((company) => (
+                                                    <option key={company._id} value={company._id}>
+                                                        {company.companyName}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <Input
+                                            label="Email de Contacto"
+                                            type="email"
+                                            value={formData.supplierEmail || ''}
+                                            onChange={(e) => setFormData({ ...formData, supplierEmail: e.target.value })}
+                                            required
+                                            placeholder="contacto@proveedor.com"
+                                        />
+                                        <Input
+                                            label="Teléfono"
+                                            value={formData.supplierPhone || ''}
+                                            onChange={(e) => setFormData({ ...formData, supplierPhone: e.target.value })}
+                                            required
+                                            placeholder="+52 555 123 4567"
+                                        />
+                                    </>
+                                )}
+
+                                {formData.role === 'company' && (
+                                    <>
+                                        <Input
+                                            label="Nombre de la Empresa / Marca"
                                             type="text"
                                             value={formData.companyName || ''}
                                             onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                                             required
-                                            placeholder="Mi Empresa S.A."
+                                            placeholder="Coca-Cola, Nestlé, etc."
                                         />
                                         <Input
-                                            label="Nombre de contacto"
-                                            type="text"
-                                            value={formData.supplierName || ''}
-                                            onChange={(e) => setFormData({ ...formData, supplierName: e.target.value })}
+                                            label="Correo de Contacto"
+                                            type="email"
+                                            value={formData.companyEmail || ''}
+                                            onChange={(e) => setFormData({ ...formData, companyEmail: e.target.value })}
                                             required
-                                            placeholder="María García"
+                                            placeholder="contacto@empresa.com"
                                         />
                                         <Input
-                                            label="Teléfono (Opcional)"
+                                            label="Teléfono"
                                             type="tel"
-                                            value={formData.supplierPhone || ''}
-                                            onChange={(e) => setFormData({ ...formData, supplierPhone: e.target.value })}
-                                            placeholder="555-5678"
+                                            value={formData.companyPhone || ''}
+                                            onChange={(e) => setFormData({ ...formData, companyPhone: e.target.value })}
+                                            required
+                                            placeholder="555-0000"
+                                        />
+                                        <Input
+                                            label="Descripción"
+                                            type="text"
+                                            value={formData.description || ''}
+                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                            placeholder="Descripción breve de la empresa"
                                         />
                                     </>
                                 )}
@@ -395,12 +496,24 @@ export default function RegisterPage() {
                                 {formData.role === 'supplier' && (
                                     <>
                                         <div>
-                                            <p className="text-sm text-gray-500">Empresa</p>
+                                            <p className="text-sm text-gray-500">Empresa Dist.</p>
                                             <p className="font-semibold text-white">{formData.companyName}</p>
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Contacto</p>
                                             <p className="font-semibold text-white">{formData.supplierName}</p>
+                                        </div>
+                                    </>
+                                )}
+                                {formData.role === 'company' && (
+                                    <>
+                                        <div>
+                                            <p className="text-sm text-gray-500">Marca/Empresa</p>
+                                            <p className="font-semibold text-white">{formData.companyName}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-500">Email Contacto</p>
+                                            <p className="font-semibold text-white">{formData.companyEmail}</p>
                                         </div>
                                     </>
                                 )}

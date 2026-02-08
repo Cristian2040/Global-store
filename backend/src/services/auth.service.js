@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Store = require('../models/Store');
 const Supplier = require('../models/Supplier');
+const Company = require('../models/Company');
 const AppError = require('../utils/AppError');
 const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/environment/env');
 const logger = require('../utils/logger');
@@ -44,10 +45,54 @@ class AuthService {
             address
         });
 
+        // Create related entity based on role
+        if (role === 'store') {
+            await Store.create({
+                userId: user._id,
+                storeName: userData.storeName,
+                ownerName: userData.ownerName,
+                address: userData.storeAddress,
+                phone: userData.storePhone
+            });
+        } else if (role === 'supplier') {
+            const supplier = await Supplier.create({
+                userId: user._id,
+                name: userData.supplierName,
+                companyName: userData.companyName,
+                companyId: userData.companyId,
+                email: userData.supplierEmail,
+                phone: userData.supplierPhone,
+                categories: userData.categories,
+                status: 'PENDING'
+            });
+
+            // If companyId is provided, link to company
+            if (userData.companyId) {
+                await Company.findByIdAndUpdate(userData.companyId, {
+                    $push: { suppliers: supplier._id }
+                });
+            }
+        } else if (role === 'company') {
+            await Company.create({
+                userId: user._id,
+                companyName: userData.companyName,
+                contactEmail: userData.companyEmail,
+                phone: userData.companyPhone,
+                address: userData.companyAddress,
+                description: userData.description
+            });
+        }
+
         // Generate token
         const token = this.generateToken(user._id);
 
         logger.info('User registered', { userId: user._id, email, role: user.role });
+
+        // Get related data if any
+        let relatedData = null;
+        if (role === 'store') relatedData = await Store.findOne({ userId: user._id });
+        if (role === 'supplier') relatedData = await Supplier.findOne({ userId: user._id });
+        if (role === 'company') relatedData = await Company.findOne({ userId: user._id });
 
         // Return user without password
         const userObject = user.toObject();
@@ -55,6 +100,7 @@ class AuthService {
 
         return {
             user: userObject,
+            relatedData,
             token,
             expiresIn: JWT_EXPIRES_IN
         };
@@ -92,6 +138,8 @@ class AuthService {
             relatedData = await Store.findOne({ userId: user._id });
         } else if (user.role === 'supplier') {
             relatedData = await Supplier.findOne({ userId: user._id });
+        } else if (user.role === 'company') {
+            relatedData = await Company.findOne({ userId: user._id });
         }
 
         // Generate token

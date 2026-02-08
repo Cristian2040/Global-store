@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Table } from '@/components/ui/Table';
 import { Button } from '@/components/ui/Button';
 import { ShoppingCart, CheckCircle, XCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Order {
     id: number;
@@ -65,24 +66,24 @@ export default function OrdersPage() {
                 <div className="flex gap-2">
                     {order.status === 'pending' && (
                         <>
-                            <Button size="sm" variant="outline">
+                            <Button size="sm" variant="outline" onClick={() => toast.success(`Pedido #${order.orderNumber} confirmado`)}>
                                 <CheckCircle className="w-4 h-4 mr-1" />
                                 Confirmar
                             </Button>
-                            <Button size="sm" variant="outline" className="text-red-400 border-red-700 hover:bg-red-900/20">
+                            <Button size="sm" variant="outline" className="text-red-400 border-red-700 hover:bg-red-900/20" onClick={() => toast.error(`Pedido #${order.orderNumber} rechazado`)}>
                                 <XCircle className="w-4 h-4 mr-1" />
                                 Rechazar
                             </Button>
                         </>
                     )}
                     {order.status === 'confirmed' && (
-                        <Button size="sm">Iniciar Preparación</Button>
+                        <Button size="sm" onClick={() => toast.info(`Iniciando preparación de pedido #${order.orderNumber}`)}>Iniciar Preparación</Button>
                     )}
                     {order.status === 'preparing' && (
-                        <Button size="sm">Marcar como Listo</Button>
+                        <Button size="sm" onClick={() => toast.success(`Pedido #${order.orderNumber} marcado como listo`)}>Marcar como Listo</Button>
                     )}
                     {order.status === 'ready' && (
-                        <Button size="sm">Completar Entrega</Button>
+                        <Button size="sm" onClick={() => toast.success(`Pedido #${order.orderNumber} entregado`)}>Completar Entrega</Button>
                     )}
                 </div>
             ),

@@ -27,13 +27,14 @@ class SupplierService {
     }
 
     async getAll(filters = {}, pagination = {}) {
-        const { active, category, search } = filters;
+        const { active, category, search, companyName } = filters;
         const { page = 1, limit = 10 } = pagination;
 
         const query = {};
 
         if (active !== undefined) query.active = active;
         if (category) query.categories = category;
+        if (companyName) query.companyName = companyName; // Apply companyName filter
         if (search) {
             query.$or = [
                 { name: { $regex: search, $options: 'i' } },

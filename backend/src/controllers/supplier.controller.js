@@ -9,7 +9,12 @@ class SupplierController {
     });
 
     getAll = asyncHandler(async (req, res) => {
-        const filters = { active: req.query.active, category: req.query.category, search: req.query.search };
+        const filters = {
+            active: req.query.active,
+            category: req.query.category,
+            search: req.query.search,
+            companyName: req.query.companyName // Add companyName filter
+        };
         const paginationOptions = { page: req.query.page, limit: req.query.limit };
 
         const result = await supplierService.getAll(filters, paginationOptions);

@@ -16,8 +16,16 @@ const supplierSchema = new mongoose.Schema({
     companyName: {
         type: String,
         required: true,
-        unique: true,
         trim: true
+    },
+    companyId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Company"
+    },
+    status: {
+        type: String,
+        enum: ['PENDING', 'ACTIVE', 'REJECTED'],
+        default: 'PENDING'
     },
     email: {
         type: String,
