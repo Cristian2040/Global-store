@@ -36,6 +36,7 @@ app.use("/api/suppliers", supplierRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/store-products", storeProductRoutes);
 app.use("/api/supplier-products", supplierProductRoutes);
+app.use("/api/companies", require("./routes/company.routes"));
 app.use("/api/customer-orders", customerOrderRoutes);
 app.use("/api/restock-orders", restockOrderRoutes);
 

@@ -37,6 +37,10 @@ const storeSchema = new mongoose.Schema(
             maxlength: 500
         },
         address: addressSchema,
+        phone: {
+            type: String,
+            trim: true
+        },
         schedule: {
             type: String
         },

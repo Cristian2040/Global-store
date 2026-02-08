@@ -3,7 +3,7 @@ export interface User {
     _id: string;
     username: string;
     email: string;
-    role: 'customer' | 'admin' | 'store' | 'supplier';
+    role: 'customer' | 'admin' | 'store' | 'supplier' | 'company';
     active: boolean;
     address?: Address;
     createdAt: string;
@@ -31,6 +31,35 @@ export interface Store {
     logo?: string;
     rating?: number;
     active: boolean;
+    orderOptions?: {
+        pickupEnabled?: boolean;
+        deliveryEnabled?: boolean;
+        allowScheduledOrders?: boolean;
+        deliveryConfig?: {
+            feeCents?: number;
+            minOrderCents?: number;
+            etaMinMinutes?: number;
+            etaMaxMinutes?: number;
+        };
+    };
+    paymentMethods?: {
+        method: 'CASH' | 'CARD' | 'TRANSFER' | 'OTHER';
+        enabled: boolean;
+        label?: string;
+        notes?: string;
+    }[];
+}
+
+
+export interface Company {
+    _id: string;
+    userId: string;
+    companyName: string;
+    contactEmail: string;
+    phone: string;
+    address?: Address;
+    description?: string;
+    active: boolean;
 }
 
 export interface Supplier {
@@ -42,6 +71,7 @@ export interface Supplier {
     phone: string;
     address?: Address;
     categories?: string[];
+    status?: 'PENDING' | 'ACTIVE' | 'REJECTED';
     active: boolean;
 }
 
@@ -74,7 +104,7 @@ export interface AuthResponse {
         user: User;
         token: string;
         expiresIn: string;
-        relatedData?: Store | Supplier;
+        relatedData?: Store | Supplier | Company;
     };
 }
 
@@ -88,7 +118,7 @@ export interface ApiResponse<T = any> {
 // Form Types
 export interface RegisterFormData {
     // Step 1
-    role: 'customer' | 'store' | 'supplier';
+    role: 'customer' | 'store' | 'supplier' | 'company';
 
     // Step 2
     username: string;
@@ -105,12 +135,21 @@ export interface RegisterFormData {
     storePhone?: string;
     storeAddress?: Address;
 
-    // Step 3 - Supplier
-    companyName?: string;
+    // Supplier specific
     supplierName?: string;
-    supplierEmail?: string;
+    companyId?: string;
     supplierPhone?: string;
     categories?: string[];
+    description?: string;
+    website?: string;
+    logo?: string;
+
+    // Restore missing fields if accidentaly removed
+    supplierEmail?: string;
+    companyEmail?: string;
+    companyName?: string;
+    companyPhone?: string;
+    companyAddress?: Address;
 }
 
 export interface LoginFormData {

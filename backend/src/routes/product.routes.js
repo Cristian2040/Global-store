@@ -13,8 +13,8 @@ router.get('/:id', validate(Joi.object({ id: objectId.required() }), 'params'), 
 
 router.use(authenticate);
 
-router.post('/', authorize('admin', 'store', 'supplier'), validate(productValidators.create), productController.create);
-router.put('/:id', authorize('admin', 'store', 'supplier'), validate(Joi.object({ id: objectId.required() }), 'params'), validate(productValidators.update), productController.update);
-router.delete('/:id', authorize('admin'), validate(Joi.object({ id: objectId.required() }), 'params'), productController.delete);
+router.post('/', authorize('admin', 'store', 'supplier', 'company'), validate(productValidators.create), productController.create);
+router.put('/:id', authorize('admin', 'store', 'supplier', 'company'), validate(Joi.object({ id: objectId.required() }), 'params'), validate(productValidators.update), productController.update);
+router.delete('/:id', authorize('admin', 'company'), validate(Joi.object({ id: objectId.required() }), 'params'), productController.delete);
 
 module.exports = router;

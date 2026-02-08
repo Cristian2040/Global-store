@@ -27,24 +27,24 @@ export function Modal({ isOpen, onClose, title, children, footer, size = 'md' }:
         <div className="fixed inset-0 z-50 overflow-y-auto">
             {/* Backdrop */}
             <div
-                className="fixed inset-0 bg-black bg-opacity-75 transition-opacity"
+                className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-all"
                 onClick={onClose}
             />
 
             {/* Modal */}
             <div className="flex min-h-full items-center justify-center p-4">
                 <div
-                    className={`relative bg-gray-800 rounded-xl shadow-xl border border-gray-700 w-full ${sizeClasses[size]} transform transition-all`}
+                    className={`relative bg-slate-900 rounded-xl shadow-2xl border border-slate-700 w-full ${sizeClasses[size]} transform transition-all`}
                     onClick={(e) => e.stopPropagation()}
                 >
                     {/* Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-gray-700">
-                        <h3 className="text-xl font-bold text-white">{title}</h3>
+                    <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
+                        <h3 className="text-xl font-bold text-white tracking-tight">{title}</h3>
                         <button
                             onClick={onClose}
-                            className="text-gray-400 hover:text-white transition-colors"
+                            className="text-slate-400 hover:text-white transition-colors bg-slate-800/50 hover:bg-slate-700 p-2 rounded-full"
                         >
-                            <X className="w-6 h-6" />
+                            <X className="w-5 h-5" />
                         </button>
                     </div>
 
@@ -53,7 +53,7 @@ export function Modal({ isOpen, onClose, title, children, footer, size = 'md' }:
 
                     {/* Footer */}
                     {footer && (
-                        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-700">
+                        <div className="flex items-center justify-end gap-3 p-6 border-t border-slate-700/50 bg-slate-900/50 rounded-b-xl">
                             {footer}
                         </div>
                     )}

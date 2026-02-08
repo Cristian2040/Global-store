@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 
 interface SidebarProps {
-    role: 'customer' | 'store' | 'supplier' | 'admin';
+    role: 'customer' | 'store' | 'supplier' | 'admin' | 'company';
 }
 
 export function Sidebar({ role }: SidebarProps) {
@@ -56,6 +56,12 @@ export function Sidebar({ role }: SidebarProps) {
             { icon: <FileText className="w-5 h-5" />, label: 'Pedidos', href: '/supplier/orders' },
             { icon: <Truck className="w-5 h-5" />, label: 'Entregas', href: '/supplier/deliveries' },
             { icon: <Settings className="w-5 h-5" />, label: 'Configuración', href: '/supplier/settings' },
+        ],
+        company: [
+            { icon: <Home className="w-5 h-5" />, label: 'Inicio', href: '/company' },
+            { icon: <Package className="w-5 h-5" />, label: 'Catálogo Global', href: '/company/products' },
+            { icon: <Truck className="w-5 h-5" />, label: 'Proveedores', href: '/company/suppliers' },
+            { icon: <Settings className="w-5 h-5" />, label: 'Configuración', href: '/company/settings' },
         ],
         admin: [
             { icon: <LayoutDashboard className="w-5 h-5" />, label: 'Dashboard', href: '/admin' },

@@ -7,6 +7,7 @@ import { Table } from '@/components/ui/Table';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { Package, Eye } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Order {
     id: number;
@@ -101,7 +102,10 @@ export default function OrdersPage() {
                         <Button variant="outline" onClick={() => setSelectedOrder(null)}>
                             Cerrar
                         </Button>
-                        <Button>Reordenar</Button>
+                        <Button onClick={() => {
+                            toast.success(`Pedido #${selectedOrder?.orderNumber} agregado al carrito`);
+                            setSelectedOrder(null);
+                        }}>Reordenar</Button>
                     </>
                 }
             >

@@ -3,11 +3,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
-import type { User, Store, Supplier, AuthResponse } from '@/types';
+import type { User, Store, Supplier, Company, AuthResponse } from '@/types';
 
 interface AuthContextType {
     user: User | null;
-    relatedData: Store | Supplier | null;
+    relatedData: Store | Supplier | Company | null;
     token: string | null;
     loading: boolean;
     login: (email: string, password: string) => Promise<void>;
@@ -20,7 +20,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
-    const [relatedData, setRelatedData] = useState<Store | Supplier | null>(null);
+    const [relatedData, setRelatedData] = useState<Store | Supplier | Company | null>(null);
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const login = async (email: string, password: string) => {
         try {
-            const response = await api.post<AuthResponse>('/api/auth/login', {
+            const response = await api.post<AuthResponse>('/auth/login', {
                 email,
                 password,
             });
@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const register = async (data: any) => {
         try {
-            const response = await api.post<AuthResponse>('/api/auth/register', data);
+            const response = await api.post<AuthResponse>('/auth/register', data);
 
             const { user, token, relatedData } = response.data.data;
 

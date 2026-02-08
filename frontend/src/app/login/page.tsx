@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import Image from 'next/image';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -22,8 +23,9 @@ export default function LoginPage() {
 
         try {
             await login(email, password);
+            toast.success('¡Bienvenido de vuelta!');
         } catch (err: any) {
-            setError(err.message);
+            toast.error(err.message || 'Error al iniciar sesión');
             setLoading(false);
         }
     };
@@ -45,11 +47,7 @@ export default function LoginPage() {
 
                 {/* Form Card */}
                 <Card className="p-8">
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-900/50 border border-red-700 rounded-lg text-red-300">
-                            {error}
-                        </div>
-                    )}
+
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <Input
