@@ -16,7 +16,11 @@ export function DashboardLayout({ children, role, title, showSearch }: Dashboard
             <Sidebar role={role} />
             <div className="flex-1 flex flex-col overflow-hidden">
                 <DashboardNavbar title={title} showSearch={showSearch} />
-                <main className="flex-1 overflow-y-auto bg-gray-900 p-6">
+                {/* He cambiado las clases de scrollbar-thin por scrollbar-hide.
+                    Asegúrate de tener instalado el plugin tailwind-scrollbar-hide 
+                    o usa el CSS personalizado que te pongo abajo.
+                */}
+                <main className="flex-1 overflow-y-auto bg-gray-900 p-6 scrollbar-hide">
                     {children}
                 </main>
             </div>
