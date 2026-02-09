@@ -65,7 +65,7 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-42">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
@@ -102,12 +102,12 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative"
             >
-              <div className="relative w-full h-96 rounded-2xl overflow-hidden shadow-2xl shadow-blue-500/20">
+              <div className="relative w-full h-96 rounded-2xl overflow-hidden shadow-2xl shadow-blue-500/100">
                 <Image
                   src="/logo.png"
                   alt="GlobalStore Platform"
                   fill
-                  className="object-contain p-12 bg-gradient-to-br from-gray-800 to-gray-900"
+                  className="object-contain p-1 bg-gradient-to-br from-gray-800 to-gray-900"
                 />
               </div>
             </motion.div>
