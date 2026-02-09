@@ -39,6 +39,7 @@ app.use("/api/supplier-products", supplierProductRoutes);
 app.use("/api/companies", require("./routes/company.routes"));
 app.use("/api/customer-orders", customerOrderRoutes);
 app.use("/api/restock-orders", restockOrderRoutes);
+app.use("/api/admin/dashboard", require("./routes/admin.routes"));
 
 // Error handling
 app.use(notFound);

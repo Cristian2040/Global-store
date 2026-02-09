@@ -1,167 +1,252 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Settings, DollarSign, Mail } from 'lucide-react';
+import { User, Mail, Phone, Lock, Loader2 } from 'lucide-react';
+import api from '@/lib/api';
+import { toast } from 'sonner';
 
 export default function AdminSettingsPage() {
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [userId, setUserId] = useState<string | null>(null);
+
     const [formData, setFormData] = useState({
-        platformName: 'GlobalStore',
-        commissionRate: '5',
-        taxRate: '15',
-        supportEmail: 'support@globalstore.com',
-        minOrderAmount: '10',
+        username: '',
+        email: '',
+        phone: '',
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log('System settings updated:', formData);
+    const [passwordData, setPasswordData] = useState({
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+    });
+
+    const fetchProfile = async () => {
+        try {
+            setLoading(true);
+            const response = await api.get('/users/profile');
+            if (response.data.success) {
+                const user = response.data.data.user;
+                setUserId(user._id);
+                setFormData({
+                    username: user.username || '',
+                    email: user.email || '',
+                    phone: user.phone || '',
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching admin profile:', error);
+            toast.error('Error al cargar la información del perfil');
+        } finally {
+            setLoading(false);
+        }
     };
 
+    useEffect(() => {
+        fetchProfile();
+    }, []);
+
+    const handleProfileUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!userId) return;
+
+        try {
+            setSaving(true);
+            const payload = {
+                username: formData.username,
+                phone: formData.phone,
+            };
+
+            const response = await api.put(`/users/${userId}`, payload);
+            if (response.data.success) {
+                toast.success('Perfil actualizado correctamente');
+            }
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            toast.error('Error al actualizar el perfil');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handlePasswordChange = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            toast.error('Las contraseñas nuevas no coinciden');
+            return;
+        }
+
+        if (passwordData.newPassword.length < 8) {
+            toast.error('La contraseña debe tener al menos 8 caracteres');
+            return;
+        }
+
+        try {
+            setSaving(true);
+            const response = await api.post('/auth/change-password', {
+                oldPassword: passwordData.oldPassword,
+                newPassword: passwordData.newPassword
+            });
+
+            if (response.data.success) {
+                toast.success('Contraseña actualizada exitosamente');
+                setPasswordData({
+                    oldPassword: '',
+                    newPassword: '',
+                    confirmPassword: ''
+                });
+            }
+        } catch (error: any) {
+            console.error('Error changing password:', error);
+            const msg = error.response?.data?.message || 'Error al cambiar la contraseña';
+            toast.error(msg);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <DashboardLayout role="admin" title="Configuración de Perfil">
+                <div className="flex items-center justify-center min-h-[400px]">
+                    <Loader2 className="w-8 h-8 text-cyan-500 animate-spin" />
+                </div>
+            </DashboardLayout>
+        );
+    }
+
     return (
-        <DashboardLayout role="admin" title="Configuración del Sistema">
+        <DashboardLayout role="admin" title="Configuración de Perfil">
             <div className="max-w-4xl space-y-6">
-                {/* Platform Settings */}
+                {/* Profile Information */}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="flex items-center">
-                            <Settings className="w-6 h-6 mr-2 text-cyan-400" />
-                            Configuración de la Plataforma
+                        <CardTitle className="flex items-center text-white">
+                            <User className="w-6 h-6 mr-2 text-cyan-400" />
+                            Información del Administrador
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleProfileUpdate} className="space-y-6">
                             <div className="grid md:grid-cols-2 gap-6">
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-400 mb-2">
-                                        Nombre de la Plataforma
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={formData.platformName}
-                                        onChange={(e) => setFormData({ ...formData, platformName: e.target.value })}
-                                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                                    />
-                                </div>
-
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400 mb-2">
-                                        Tasa de Comisión (%)
+                                        Nombre de Usuario
                                     </label>
                                     <div className="relative">
-                                        <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+                                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                                         <input
-                                            type="number"
-                                            step="0.1"
-                                            value={formData.commissionRate}
-                                            onChange={(e) => setFormData({ ...formData, commissionRate: e.target.value })}
+                                            type="text"
+                                            value={formData.username}
+                                            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                                             className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                                            required
                                         />
                                     </div>
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400 mb-2">
-                                        Tasa de Impuesto (%)
-                                    </label>
-                                    <div className="relative">
-                                        <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
-                                        <input
-                                            type="number"
-                                            step="0.1"
-                                            value={formData.taxRate}
-                                            onChange={(e) => setFormData({ ...formData, taxRate: e.target.value })}
-                                            className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-2">
-                                        Correo de Soporte
+                                        Correo Electrónico
                                     </label>
                                     <div className="relative">
                                         <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                                         <input
                                             type="email"
-                                            value={formData.supportEmail}
-                                            onChange={(e) => setFormData({ ...formData, supportEmail: e.target.value })}
-                                            className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                                            value={formData.email}
+                                            disabled
+                                            className="w-full pl-10 pr-4 py-3 bg-gray-700/50 border border-gray-600 text-gray-400 rounded-lg cursor-not-allowed"
                                         />
                                     </div>
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400 mb-2">
-                                        Monto Mínimo de Pedido ($)
+                                        Teléfono
                                     </label>
                                     <div className="relative">
-                                        <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+                                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                                         <input
-                                            type="number"
-                                            step="0.01"
-                                            value={formData.minOrderAmount}
-                                            onChange={(e) => setFormData({ ...formData, minOrderAmount: e.target.value })}
+                                            type="tel"
+                                            value={formData.phone}
+                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                             className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                                            placeholder="+52 ..."
                                         />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex justify-end gap-3">
-                                <Button variant="outline" type="button">
-                                    Cancelar
-                                </Button>
-                                <Button type="submit">
-                                    Guardar Cambios
+                            <div className="flex justify-end gap-3 pt-4 border-t border-gray-700">
+                                <Button type="submit" disabled={saving}>
+                                    {saving ? 'Guardando...' : 'Guardar Cambios'}
                                 </Button>
                             </div>
                         </form>
                     </CardContent>
                 </Card>
 
-                {/* Email Templates */}
+                {/* Change Password */}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="flex items-center">
-                            <Mail className="w-6 h-6 mr-2 text-cyan-400" />
-                            Plantillas de Correo
+                        <CardTitle className="flex items-center text-white">
+                            <Lock className="w-6 h-6 mr-2 text-cyan-400" />
+                            Cambiar Contraseña
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-4">
-                            <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h4 className="text-white font-semibold">Bienvenida de Usuario</h4>
-                                        <p className="text-sm text-gray-400">Enviado al registrarse un nuevo usuario</p>
-                                    </div>
-                                    <Button size="sm" variant="outline">Editar</Button>
+                        <form onSubmit={handlePasswordChange} className="space-y-6">
+                            <div className="max-w-md space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-2">
+                                        Contraseña Actual
+                                    </label>
+                                    <input
+                                        type="password"
+                                        value={passwordData.oldPassword}
+                                        onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
+                                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-2">
+                                        Nueva Contraseña
+                                    </label>
+                                    <input
+                                        type="password"
+                                        value={passwordData.newPassword}
+                                        onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-2">
+                                        Confirmar Nueva Contraseña
+                                    </label>
+                                    <input
+                                        type="password"
+                                        value={passwordData.confirmPassword}
+                                        onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                                        required
+                                    />
                                 </div>
                             </div>
 
-                            <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h4 className="text-white font-semibold">Confirmación de Pedido</h4>
-                                        <p className="text-sm text-gray-400">Enviado al confirmar un pedido</p>
-                                    </div>
-                                    <Button size="sm" variant="outline">Editar</Button>
-                                </div>
+                            <div className="flex justify-end pt-4 border-t border-gray-700">
+                                <Button type="submit" disabled={saving}>
+                                    {saving ? 'Actualizando...' : 'Actualizar Contraseña'}
+                                </Button>
                             </div>
-
-                            <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h4 className="text-white font-semibold">Recuperación de Contraseña</h4>
-                                        <p className="text-sm text-gray-400">Enviado al solicitar recuperación</p>
-                                    </div>
-                                    <Button size="sm" variant="outline">Editar</Button>
-                                </div>
-                            </div>
-                        </div>
+                        </form>
                     </CardContent>
                 </Card>
             </div>

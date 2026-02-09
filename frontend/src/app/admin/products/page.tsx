@@ -1,78 +1,133 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Table } from '@/components/ui/Table';
 import { Button } from '@/components/ui/Button';
-import { Package, Eye, Trash2 } from 'lucide-react';
+import { Package, Trash2, Tag, Building2, Eye } from 'lucide-react';
+import api from '@/lib/api';
+import { toast } from 'sonner';
 
 interface ProductData {
-    id: number;
+    _id: string;
     name: string;
     category: string;
-    store: string;
-    price: number;
-    stock: number;
-    status: 'active' | 'inactive' | 'flagged';
+    company: string;
+    unit: string;
+    barcode: string;
+    image?: string;
+    createdAt: string;
 }
 
 export default function ProductsManagementPage() {
-    const products: ProductData[] = [
-        { id: 1, name: 'Manzanas Rojas', category: 'Frutas', store: 'Tienda Local 1', price: 2.50, stock: 45, status: 'active' },
-        { id: 2, name: 'Leche Entera', category: 'Lácteos', store: 'Supermercado Central', price: 1.80, stock: 120, status: 'active' },
-        { id: 3, name: 'Pan Integral', category: 'Panadería', store: 'Tienda del Barrio', price: 1.20, stock: 30, status: 'active' },
-        { id: 4, name: 'Tomates', category: 'Verduras', store: 'Mercado Express', price: 3.00, stock: 80, status: 'flagged' },
-        { id: 5, name: 'Pollo Fresco', category: 'Carnes', store: 'Tienda Orgánica', price: 5.50, stock: 0, status: 'inactive' },
-    ];
+    const [products, setProducts] = useState<ProductData[]>([]);
+    const [categories, setCategories] = useState<string[]>([]);
+    const [companies, setCompanies] = useState<string[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [totalProducts, setTotalProducts] = useState(0);
 
-    const statusColors = {
-        active: 'bg-green-900/50 border-green-700 text-green-300',
-        inactive: 'bg-gray-800 border-gray-700 text-gray-400',
-        flagged: 'bg-orange-900/50 border-orange-700 text-orange-300',
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const [productsRes, categoriesRes, companiesRes] = await Promise.all([
+                api.get('/products'),
+                api.get('/products/categories'),
+                api.get('/products/companies')
+            ]);
+
+            setProducts(productsRes.data.data);
+            setTotalProducts(productsRes.data.pagination.total);
+            setCategories(categoriesRes.data.data);
+            setCompanies(companiesRes.data.data);
+        } catch (error) {
+            console.error('Error fetching product data:', error);
+            toast.error('Error al cargar productos');
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const statusLabels = {
-        active: 'Activo',
-        inactive: 'Inactivo',
-        flagged: 'Marcado',
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const handleDelete = async (id: string, name: string) => {
+        if (!confirm(`¿Estás seguro de eliminar el producto "${name}"? Esto podría afectar a las tiendas que lo tienen en inventario.`)) {
+            return;
+        }
+
+        try {
+            await api.delete(`/products/${id}`);
+            toast.success(`Producto ${name} eliminado correctamente`);
+            fetchData();
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            toast.error('Error al eliminar producto');
+        }
     };
 
     const columns = [
-        { key: 'name', header: 'Producto' },
-        { key: 'category', header: 'Categoría' },
-        { key: 'store', header: 'Tienda' },
-        { key: 'price', header: 'Precio', render: (product: ProductData) => `$${product.price.toFixed(2)}` },
-        { key: 'stock', header: 'Stock', render: (product: ProductData) => `${product.stock} unidades` },
         {
-            key: 'status',
-            header: 'Estado',
+            key: 'image',
+            header: 'Imagen',
             render: (product: ProductData) => (
-                <span className={`inline-block px-3 py-1 text-xs font-semibold border rounded-full ${statusColors[product.status]}`}>
-                    {statusLabels[product.status]}
+                <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden">
+                    {product.image ? (
+                        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                    ) : (
+                        <Package className="w-5 h-5 text-gray-500" />
+                    )}
+                </div>
+            )
+        },
+        { key: 'name', header: 'Producto' },
+        {
+            key: 'category',
+            header: 'Categoría',
+            render: (product: ProductData) => (
+                <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-900/30 text-blue-400 rounded-md">
+                    {product.category || 'Sin categoría'}
                 </span>
-            ),
+            )
+        },
+        {
+            key: 'company',
+            header: 'Empresa / Marca',
+            render: (product: ProductData) => (
+                <div className="flex items-center text-sm text-gray-300">
+                    <Building2 className="w-3 h-3 mr-1 text-gray-500" />
+                    {product.company || 'N/A'}
+                </div>
+            )
+        },
+        { key: 'unit', header: 'Unidad' },
+        {
+            key: 'createdAt',
+            header: 'Creado',
+            render: (product: ProductData) => new Date(product.createdAt).toLocaleDateString()
         },
         {
             key: 'actions',
             header: 'Acciones',
             render: (product: ProductData) => (
                 <div className="flex gap-2">
-                    <button className="p-2 text-cyan-400 hover:bg-cyan-900/20 rounded-lg transition-colors">
-                        <Eye className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors">
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-red-400 border-red-700 hover:bg-red-900/20 p-2 h-8 w-8"
+                        onClick={() => handleDelete(product._id, product.name)}
+                        title="Eliminar del catálogo global"
+                    >
                         <Trash2 className="w-4 h-4" />
-                    </button>
+                    </Button>
                 </div>
             ),
         },
     ];
 
-    const activeCount = products.filter(p => p.status === 'active').length;
-    const flaggedCount = products.filter(p => p.status === 'flagged').length;
-
     return (
-        <DashboardLayout role="admin" title="Gestión de Productos">
+        <DashboardLayout role="admin" title="Gestión de Productos (Catálogo Global)">
             <div className="space-y-6">
                 {/* Stats */}
                 <div className="grid md:grid-cols-3 gap-6">
@@ -81,7 +136,7 @@ export default function ProductsManagementPage() {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-gray-400 mb-1">Total Productos</p>
-                                    <p className="text-3xl font-bold text-white">{products.length}</p>
+                                    <p className="text-3xl font-bold text-white">{totalProducts}</p>
                                 </div>
                                 <Package className="w-8 h-8 text-cyan-400" />
                             </div>
@@ -92,10 +147,10 @@ export default function ProductsManagementPage() {
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-400 mb-1">Activos</p>
-                                    <p className="text-3xl font-bold text-green-400">{activeCount}</p>
+                                    <p className="text-sm text-gray-400 mb-1">Categorías</p>
+                                    <p className="text-3xl font-bold text-blue-400">{categories.length}</p>
                                 </div>
-                                <Package className="w-8 h-8 text-green-400" />
+                                <Tag className="w-8 h-8 text-blue-400" />
                             </div>
                         </CardContent>
                     </Card>
@@ -104,10 +159,10 @@ export default function ProductsManagementPage() {
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-400 mb-1">Marcados</p>
-                                    <p className="text-3xl font-bold text-orange-400">{flaggedCount}</p>
+                                    <p className="text-sm text-gray-400 mb-1">Marcas / Empresas</p>
+                                    <p className="text-3xl font-bold text-purple-400">{companies.length}</p>
                                 </div>
-                                <Package className="w-8 h-8 text-orange-400" />
+                                <Building2 className="w-8 h-8 text-purple-400" />
                             </div>
                         </CardContent>
                     </Card>
@@ -118,11 +173,15 @@ export default function ProductsManagementPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center">
                             <Package className="w-6 h-6 mr-2 text-cyan-400" />
-                            Todos los Productos
+                            Catálogo de Productos Globales
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <Table data={products} columns={columns} />
+                        {loading ? (
+                            <div className="text-center py-8 text-gray-400">Cargando catálogo...</div>
+                        ) : (
+                            <Table data={products} columns={columns} />
+                        )}
                     </CardContent>
                 </Card>
             </div>
