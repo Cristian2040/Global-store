@@ -1,86 +1,64 @@
 # 🌍 GlobalStore - Multi-Role E-Commerce Platform
 
-**GlobalStore** is a comprehensive e-commerce solution designed to connect **Customers**, **Stores**, **Suppliers**, and **Companies** in a seamless ecosystem. Built with a modern tech stack, it facilitates the entire supply chain from supplier restocking to customer delivery.
+**GlobalStore** is a comprehensive e-commerce solution that connects **Customers**, **Stores**, **Suppliers**, and **Companies** in a seamless, role-based ecosystem.
 
-## 🚀 Key Features
+## 📚 Documentación Completa
 
-### 👤 Customer Experience
-- **Interactive Dashboard**: Real-time stats, order tracking, and favorite stores.
-- **Smart Shopping**: Multi-store cart, dynamic checkout, and intelligent product search.
-- **GastroBot 🤖**: AI-powered assistant for recipe suggestions and site navigation.
-- **Geo-Location**: Interactive map to find nearby stores.
+Hemos centralizado toda la información técnica y funcional en la carpeta [`docs/`](./docs/). Por favor, consulta los siguientes enlaces para una guía detallada:
 
-### 🏪 Store Operations
-- **Inventory Management**: Real-time stock tracking and low-stock alerts.
-- **Supplier Integration**: Browse supplier catalogs and restock inventory directly.
-- **Order Fulfillment**: Manage customer orders and track delivery status.
-- **Analytics**: Sales performance and inventory health reports.
+### 🏗️ [Arquitectura](./docs/architecture/overview.md)
+*   [**Visión General**](./docs/architecture/overview.md): Diseño del sistema y patrones core.
+*   [**Modelos de Datos**](./docs/architecture/data_models.md): Modelos Mongoose, ERD e indexación.
+*   [**Seguridad**](./docs/architecture/security.md): JWT, Auth y control de acceso (RBAC).
 
-### 🚚 Supplier Management
-- **Catalog Control**: Manage products, pricing, and availability.
-- **Restock Requests**: Process bulk orders from stores.
-- **Delivery Tracking**: Manage logistics and delivery confirmations.
+### ✨ [Módulos Funcionales](./docs/functional/customer_flow.md)
+*   [**Flujo del Cliente**](./docs/functional/customer_flow.md): Carrito inteligente, mapas y GastroBot.
+*   [**Operaciones de Tienda**](./docs/functional/store_operations.md): Gestión de inventario y pedidos.
+*   [**Surtimiento de Proveedores**](./docs/functional/supplier_fulfillment.md): Catálogo mayorista y entregas.
+*   [**Control Administrativo**](./docs/functional/admin_oversight.md): Dashboard de control y analíticas.
 
-### 🏢 Company/Admin Control
-- **System Oversight**: User management and platform configuration.
-- **Global Catalog**: Standardize products across the ecosystem.
-- **Audit Logs**: Track all system activities.
+### 🛠️ [Referencia Técnica](./docs/technical/backend_stack.md)
+*   [**Stack Backend**](./docs/technical/backend_stack.md): Node.js, Express, MongoDB y Joi.
+*   [**Stack Frontend**](./docs/technical/frontend_stack.md): Next.js 14, Tailwind y Context API.
+*   [**Manifiesto de Endpoints**](./docs/technical/endpoints_manifest.md): Catálogo completo de la API.
 
-## 🛠️ Quick Start
+### 🚀 [Desarrollo y Ops](./docs/development/setup_guide.md)
+*   [**Guía de Instalación**](./docs/development/setup_guide.md): Setup local paso a paso.
+*   [**Pruebas (Testing)**](./docs/development/testing.md): Estándares y ejecución de tests.
 
-### Prerequisites
+### 📖 [Manuales de Usuario](./docs/user_guides/customer_manual.md)
+*   [Manual del **Cliente**](./docs/user_guides/customer_manual.md)
+*   [Manual de la **Tienda**](./docs/user_guides/store_manual.md)
+*   [Manual del **Proveedor**](./docs/user_guides/supplier_manual.md)
+*   [Manual del **Administrador**](./docs/user_guides/admin_manual.md)
+
+---
+
+## 🛠️ Inicio Rápido
+
+### Requisitos
 - Node.js (v18+)
-- MongoDB (Running instance)
-- npm or yarn
+- MongoDB (Instancia local o Atlas)
 
-### Installation
+### Instalación en 3 pasos
 
-1.  **Clone the repository**
+1.  **Clonar y Dependencias**
     ```bash
     git clone https://github.com/FelipeEstrellaPro/GlobalStore.git
     cd GlobalStore
+    cd backend && npm install && cd ../frontend && npm install
     ```
 
-2.  **Install Dependencies**
-    ```bash
-    # Install Backend Dependencies
-    cd backend
-    npm install
+2.  **Configuración**
+    - Crea el archivo `.env` en `backend/` y `.env.local` en `frontend/` usando los ejemplos proporcionados.
 
-    # Install Frontend Dependencies
-    cd ../frontend
-    npm install
-    ```
+3.  **Ejecutar**
+    - Backend: `npm run dev` (en carpeta backend)
+    - Frontend: `npm run dev` (en carpeta frontend)
 
-3.  **Configuration**
-    - Create a `.env` file in `backend/` (see `backend/.env.example`).
-    - Create a `.env.local` file in `frontend/` (see `frontend/.env.example`).
+---
 
-4.  **Run the Application**
-    ```bash
-    # Terminal 1: Start Backend
-    cd backend
-    npm run dev
-
-    # Terminal 2: Start Frontend
-    cd frontend
-    npm run dev
-    ```
-
-5.  **Access the App**
-    - Frontend: `http://localhost:3000`
-    - Backend API: `http://localhost:5000`
-
-## 📚 Documentation
-
-Explore the detailed documentation for each aspect of the system:
-
-- [**Architecture**](./ARCHITECTURE.md): System design, roles, and data flow.
-- [**API Endpoints**](./ENDPOINTS.md): Comprehensive list of backend API routes.
-- [**Technologies**](./TECHNOLOGIES.md): Full tech stack and libraries used.
-- [**Diagrams**](./DIAGRAMS.md): Visual representations of flows and schemas.
-
-## 🤝 Contributors
+## 🤝 Contribuidores
 
 - **Felipe Estrella** - Lead Developer
 - **Antigravity AI** - AI Co-Pilot
