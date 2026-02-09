@@ -141,6 +141,10 @@ All endpoints mounted under `/api`:
   POST   /:id/accept
   POST   /:id/reject
   POST   /:id/confirm-delivery
+
+/api/admin/dashboard
+  GET    /stats
+  GET    /recent-activity
 ```
 
 ### Testing Setup
