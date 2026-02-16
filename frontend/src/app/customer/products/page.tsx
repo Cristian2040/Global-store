@@ -36,11 +36,34 @@ export default function ProductsPage() {
     const [debouncedSearch] = useDebounce(searchTerm, 500);
     const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
 
-    const categories = ['Todas las categorías', 'Frutas', 'Verduras', 'Lácteos', 'Carnes', 'Panadería', 'Bebidas', 'Limpieza'];
+    // Advanced Filters State
+    const [showAdvanced, setShowAdvanced] = useState(false);
+    const [minPrice, setMinPrice] = useState('');
+    const [maxPrice, setMaxPrice] = useState('');
+    const [company, setCompany] = useState('Todas las compañías');
+    const [sort, setSort] = useState('newest');
+    const [companies, setCompanies] = useState<string[]>(['Todas las compañías']);
+
+    const categories = ['Todas las categorías', 'Frutas', 'Verduras', 'Lácteos', 'Carnes', 'Panadería', 'Bebidas', 'Limpieza', 'Electrónica', 'Hogar', 'Deportes', 'Moda'];
+
+    useEffect(() => {
+        fetchCompanies();
+    }, []);
 
     useEffect(() => {
         fetchProducts();
-    }, [debouncedSearch, category]);
+    }, [debouncedSearch, category, company, sort]);
+
+    const fetchCompanies = async () => {
+        try {
+            const response = await api.get('/products/companies');
+            if (response.data.success) {
+                setCompanies(['Todas las compañías', ...response.data.data]);
+            }
+        } catch (error) {
+            console.error('Error fetching companies:', error);
+        }
+    };
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -48,6 +71,10 @@ export default function ProductsPage() {
             const params = new URLSearchParams();
             if (debouncedSearch) params.append('search', debouncedSearch);
             if (category !== 'Todas las categorías') params.append('category', category);
+            if (company !== 'Todas las compañías') params.append('company', company);
+            if (minPrice) params.append('minPrice', minPrice);
+            if (maxPrice) params.append('maxPrice', maxPrice);
+            if (sort) params.append('sort', sort);
 
             const response = await api.get(`/store-products?${params.toString()}`);
             if (response.data.success) {
@@ -59,6 +86,16 @@ export default function ProductsPage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleClearFilters = () => {
+        setSearchTerm('');
+        setCategory('Todas las categorías');
+        setCompany('Todas las compañías');
+        setMinPrice('');
+        setMaxPrice('');
+        setSort('newest');
+        toast.info('Filtros limpiados');
     };
 
     const handleQuantityChange = (productId: string, delta: number, max: number) => {
@@ -96,34 +133,102 @@ export default function ProductsPage() {
         <DashboardLayout role="customer" title="Productos">
             <div className="space-y-6">
                 {/* Filters and Search */}
-                <Card>
-                    <CardContent className="p-6">
-                        <div className="flex flex-col md:flex-row gap-4">
-                            <div className="relative flex-1">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
-                                <input
-                                    type="text"
-                                    placeholder="Buscar productos..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                                />
+                <div className="space-y-4">
+                    <Card className="bg-gray-800/80 border-gray-700 shadow-xl backdrop-blur-sm">
+                        <CardContent className="p-6">
+                            <div className="flex flex-col md:flex-row gap-4">
+                                <div className="relative flex-1">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+                                    <input
+                                        type="text"
+                                        placeholder="Buscar por nombre o descripción..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-700 text-white placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all"
+                                    />
+                                </div>
+                                <div className="flex gap-2">
+                                    <Button
+                                        onClick={() => setShowAdvanced(!showAdvanced)}
+                                        variant="outline"
+                                        className={`h-full border-gray-700 ${showAdvanced ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50' : 'text-gray-400'}`}
+                                    >
+                                        <Filter className="w-4 h-4 mr-2" />
+                                        Filtros {showAdvanced ? 'v' : '>'}
+                                    </Button>
+                                    <Button onClick={fetchProducts} className="bg-cyan-600 hover:bg-cyan-500 text-white">
+                                        Buscar
+                                    </Button>
+                                    <Button variant="ghost" onClick={handleClearFilters} className="text-gray-500 hover:text-white">
+                                        Limpiar
+                                    </Button>
+                                </div>
                             </div>
-                            <div className="relative w-full md:w-64">
-                                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
-                                <select
-                                    value={category}
-                                    onChange={(e) => setCategory(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 appearance-none"
-                                >
-                                    {categories.map((cat) => (
-                                        <option key={cat}>{cat}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+
+                            {/* Advanced Panel */}
+                            {showAdvanced && (
+                                <div className="mt-6 pt-6 border-t border-gray-700 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Categoría</label>
+                                        <select
+                                            value={category}
+                                            onChange={(e) => setCategory(e.target.value)}
+                                            className="w-full px-4 py-2 bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-500 appearance-none cursor-pointer"
+                                        >
+                                            {categories.map((cat) => (
+                                                <option key={cat}>{cat}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Empresa / Marca</label>
+                                        <select
+                                            value={company}
+                                            onChange={(e) => setCompany(e.target.value)}
+                                            className="w-full px-4 py-2 bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-500 appearance-none cursor-pointer"
+                                        >
+                                            {companies.map((comp) => (
+                                                <option key={comp}>{comp}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Rango de Precio</label>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="number"
+                                                placeholder="Min"
+                                                value={minPrice}
+                                                onChange={(e) => setMinPrice(e.target.value)}
+                                                className="w-full px-3 py-2 bg-gray-900 border border-gray-700 text-white rounded-lg text-sm focus:ring-1 focus:ring-cyan-500"
+                                            />
+                                            <span className="text-gray-600">-</span>
+                                            <input
+                                                type="number"
+                                                placeholder="Max"
+                                                value={maxPrice}
+                                                onChange={(e) => setMaxPrice(e.target.value)}
+                                                className="w-full px-3 py-2 bg-gray-900 border border-gray-700 text-white rounded-lg text-sm focus:ring-1 focus:ring-cyan-500"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Ordenar por</label>
+                                        <select
+                                            value={sort}
+                                            onChange={(e) => setSort(e.target.value)}
+                                            className="w-full px-4 py-2 bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-500 appearance-none cursor-pointer"
+                                        >
+                                            <option value="newest">Más recientes</option>
+                                            <option value="price_asc">Menor precio</option>
+                                            <option value="price_desc">Mayor precio</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
 
                 {/* Products Grid */}
                 {loading ? (

@@ -51,17 +51,17 @@ class StoreProductService {
     }
 
     async getAll(filters = {}, pagination = {}) {
-        const { search, category, minPrice, maxPrice } = filters;
+        const { search, category, company, minPrice, maxPrice, sort } = filters;
         const { page = 1, limit = 20 } = pagination;
 
         const query = { active: true, availableQuantity: { $gt: 0 } };
 
-        // If filtering by product properties (name, category), we might need to filter after population or use aggregate
-        // For better performance with large datasets, we should find matching Product IDs first
-        if (search || category) {
+        // 1. Filter by Product properties (sub-query for performance)
+        if (search || (category && category !== 'Todas las categorías') || company) {
             const productQuery = {};
             if (search) productQuery.name = { $regex: search, $options: 'i' };
             if (category && category !== 'Todas las categorías') productQuery.category = category;
+            if (company && company !== 'Todas las compañías') productQuery.company = company;
 
             const matchingProducts = await Product.find(productQuery).select('_id');
             const matchingProductIds = matchingProducts.map(p => p._id);
@@ -73,11 +73,18 @@ class StoreProductService {
             }
         }
 
+        // 2. Filter by StoreProduct properties (Price)
         if (minPrice !== undefined || maxPrice !== undefined) {
             query.finalPriceCents = {};
-            if (minPrice !== undefined) query.finalPriceCents.$gte = minPrice * 100;
-            if (maxPrice !== undefined) query.finalPriceCents.$lte = maxPrice * 100;
+            if (minPrice) query.finalPriceCents.$gte = Number(minPrice) * 100;
+            if (maxPrice) query.finalPriceCents.$lte = Number(maxPrice) * 100;
         }
+
+        // 3. Sorting
+        let sortOption = { createdAt: -1 };
+        if (sort === 'price_asc') sortOption = { finalPriceCents: 1 };
+        if (sort === 'price_desc') sortOption = { finalPriceCents: -1 };
+        if (sort === 'newest') sortOption = { createdAt: -1 };
 
         const skip = (page - 1) * limit;
 
@@ -85,7 +92,7 @@ class StoreProductService {
             StoreProduct.find(query)
                 .populate('productId')
                 .populate('storeId', 'storeName logo address')
-                .sort({ createdAt: -1 })
+                .sort(sortOption)
                 .skip(skip)
                 .limit(limit),
             StoreProduct.countDocuments(query)
