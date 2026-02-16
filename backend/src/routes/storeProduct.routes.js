@@ -6,9 +6,10 @@ const { authenticate, authorize } = require('../middlewares/auth.middleware');
 const { storeProductValidators, objectId } = require('../utils/validators');
 const Joi = require('joi');
 
-router.use(authenticate);
-
 router.get('/', storeProductController.getAll); // Public route for browsing
+router.get('/search', storeProductController.getAll); // Alias for deliverable
+
+router.use(authenticate);
 router.post('/', authorize('admin', 'store'), validate(storeProductValidators.create), storeProductController.addProduct);
 router.get('/store/:storeId', validate(Joi.object({ storeId: objectId.required() }), 'params'), storeProductController.getByStore);
 router.get('/:id', validate(Joi.object({ id: objectId.required() }), 'params'), storeProductController.getById);

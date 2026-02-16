@@ -20,8 +20,10 @@ class StoreProductController {
         const filters = {
             search: req.query.search,
             category: req.query.category,
+            company: req.query.company,
             minPrice: req.query.minPrice,
-            maxPrice: req.query.maxPrice
+            maxPrice: req.query.maxPrice,
+            sort: req.query.sort
         };
         const pagination = {
             page: req.query.page,

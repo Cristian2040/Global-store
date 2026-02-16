@@ -12,7 +12,7 @@ export default function CompanyLayout({ children }: { children: React.ReactNode 
     useEffect(() => {
         if (!loading) {
             if (!user) {
-                router.push('/auth/login');
+                router.push('/');
             } else if (user.role !== 'company') {
                 router.push('/');
             }
