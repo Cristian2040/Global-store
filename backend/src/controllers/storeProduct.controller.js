@@ -1,6 +1,7 @@
 const storeProductService = require('../services/storeProduct.service');
 const asyncHandler = require('../utils/asyncHandler');
-const { success } = require('../utils/responseHandler');
+const { success, paginated } = require('../utils/responseHandler');
+const AppError = require('../utils/AppError');
 
 class StoreProductController {
     addProduct = asyncHandler(async (req, res) => {
@@ -16,35 +17,37 @@ class StoreProductController {
         success(res, products, 'Store products retrieved successfully');
     });
 
+    /**
+     * GET /api/store-products  (public)
+     * GET /api/search          (public alias)
+     *
+     * Query params:
+     *   q / search    – keyword (max 100 chars)
+     *   category      – exact category string
+     *   company       – exact brand/company string
+     *   minPrice      – min price in pesos
+     *   maxPrice      – max price in pesos
+     *   sort          – newest | price_asc | price_desc
+     *   page          – page number (default 1)
+     *   limit         – items per page (default 20, max 50)
+     */
     getAll = asyncHandler(async (req, res) => {
-        const filters = {
-            search: req.query.search,
-            category: req.query.category,
-            company: req.query.company,
-            minPrice: req.query.minPrice,
-            maxPrice: req.query.maxPrice,
-            sort: req.query.sort
-        };
-        const pagination = {
-            page: req.query.page,
-            limit: req.query.limit
-        };
+        const { q, search, category, company, minPrice, maxPrice, sort, page, limit } = req.query;
 
-        const result = await storeProductService.getAll(filters, pagination);
-        // Using success for now as paginated helper structure might vary, or construct manual response
-        // Checking responseHandler... usually paginated(res, docs, paginationInfo, msg)
-        // Let's assume paginated helper exists locally imported in controller.
-        // Re-reading controller imports: const { success } = require('../utils/responseHandler');
-        // Need to add paginated to imports if not present.
-        // Wait, line 3 only imports success: const { success } = require('../utils/responseHandler');
-        // I should update imports too.
+        // Basic security: reject absurdly large page numbers
+        if (page && (isNaN(Number(page)) || Number(page) < 1)) {
+            return res.status(400).json({
+                success: false,
+                message: 'El parámetro "page" debe ser un número entero positivo.'
+            });
+        }
 
-        res.status(200).json({
-            success: true,
-            data: result.products,
-            pagination: result.pagination,
-            message: 'Global products retrieved successfully'
-        });
+        const filters = { q, search, category, company, minPrice, maxPrice, sort };
+        const paginationOpts = { page, limit };
+
+        const result = await storeProductService.getAll(filters, paginationOpts);
+
+        return paginated(res, result.items, result.pagination, 'Productos obtenidos correctamente');
     });
 
     getById = asyncHandler(async (req, res) => {

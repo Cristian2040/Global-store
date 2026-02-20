@@ -20,15 +20,7 @@ class ProductController {
     });
 
     getAll = asyncHandler(async (req, res) => {
-        const filters = {
-            category: req.query.category,
-            company: req.query.company,
-            search: req.query.search,
-            min: req.query.min,
-            max: req.query.max,
-            tags: req.query.tags,
-            sort: req.query.sort
-        };
+        const filters = { category: req.query.category, company: req.query.company, search: req.query.search };
         const paginationOptions = { page: req.query.page, limit: req.query.limit };
 
         console.log('DEBUG: ProductController.getAll called with queries:', req.query);

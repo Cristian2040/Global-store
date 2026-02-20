@@ -19,43 +19,18 @@ class ProductService {
     }
 
     async getAll(filters = {}, pagination = {}) {
-        const { category, company, search, min, max, tags, sort } = filters;
+        const { category, company, search } = filters;
         const { page = 1, limit = 10 } = pagination;
 
         const query = {};
 
         if (category) query.category = category;
         if (company) query.company = company;
-        if (min || max) {
-            query.price = {};
-            if (min) query.price.$gte = Number(min);
-            if (max) query.price.$lte = Number(max);
-        }
-        if (tags) {
-            const tagsArray = tags.split(',').map(t => t.trim());
-            if (tagsArray.length > 0) {
-                query.tags = { $in: tagsArray };
-            }
-        }
         if (search) {
             query.$or = [
                 { name: { $regex: search, $options: 'i' } },
-                { description: { $regex: search, $options: 'i' } },
-                { tags: { $regex: search, $options: 'i' } },
                 { barcode: search }
             ];
-        }
-
-        let sortOption = { createdAt: -1 };
-        if (sort) {
-            switch (sort) {
-                case 'price_asc': sortOption = { price: 1 }; break;
-                case 'price_desc': sortOption = { price: -1 }; break;
-                case 'newest': sortOption = { createdAt: -1 }; break;
-                case 'oldest': sortOption = { createdAt: 1 }; break;
-                case 'relevance': break; // handled by default or could be text score
-                default: sortOption = { createdAt: -1 };
-            }
         }
 
         const skip = (page - 1) * limit;
@@ -63,7 +38,7 @@ class ProductService {
             Product.find(query)
                 .limit(limit)
                 .skip(skip)
-                .sort(sortOption),
+                .sort({ createdAt: -1 }),
             Product.countDocuments(query)
         ]);
 

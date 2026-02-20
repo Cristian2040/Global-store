@@ -205,11 +205,7 @@ const productValidators = {
         company: Joi.string().trim(),
         search: Joi.string().trim().allow(''),
         page: Joi.number().integer().min(1).default(1),
-        limit: Joi.number().integer().min(1).max(100).default(10),
-        min: Joi.number().min(0),
-        max: Joi.number().min(0),
-        tags: Joi.string().trim(),
-        sort: Joi.string().valid('price_asc', 'price_desc', 'newest', 'oldest', 'relevance')
+        limit: Joi.number().integer().min(1).max(100).default(10)
     })
 };
 
